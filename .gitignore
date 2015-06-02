@@ -1,0 +1,10 @@
+#mvn
+target/
+
+#eclipse
+.settings/
+.classpath
+.project
+
+#general
+*.log
