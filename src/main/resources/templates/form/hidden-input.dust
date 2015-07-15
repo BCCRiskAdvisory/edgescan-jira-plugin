@@ -1,0 +1,1 @@
+<input type="{type}" id="{name}" name="{name}" class="{type}" {?value}value="{value}"{/value}>

@@ -1,0 +1,67 @@
+<table class="aui">
+    <thead></thead>
+    <tbody>
+        <tr>
+            <td>Connection</td>
+            <td>{connectionName}</td>
+        </tr>
+        <tr>
+            <td>Linked Edgescan Assets</td>
+            <td><ul class="unstyled"> 
+                {#assets}<li>{.}</li>{/assets}
+            </ul></td>
+        </tr>
+        <tr>
+            <td>Priority Mappings:</td>
+            <td>
+                <table>
+                    <thead>
+                        <th>Edgescan Risk</th>
+                        <th></th>
+                        <th>Jira Priority</th>
+                    </thead>
+                    <tbody>
+                        {#priorities}
+                            {+priority/}
+                        {/priorities}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>Act as User</td>
+            <td>{+icon:userDetails/}</td>
+        </tr>
+        <tr>
+            <td>Issue Type</td>
+            <td>{+icon:issueTypeDetails/}</td>
+        </tr>
+        <tr>
+            <td>Status on Open</td>
+            <td>{+badge:openStatusDetails/}</td>
+        </tr>
+        <tr>
+            <td>Status on Close</td>
+            <td>{+badge:closeStatusDetails/}</td>
+        </tr>
+    </tbody>
+</table>
+{<priority}
+    <tr>
+        <td>{riskName}</td>
+        <td><span class="aui-icon aui-icon-small aui-iconfont-devtools-arrow-right"></span></td>
+        <td>
+            {?icon} <img src="{icon}" alt="{priorityName}"> {/icon}
+            {~s}{priorityName}</td>
+    </tr>
+{/priority}
+{<icon}
+    {?icon} <img src="{icon}" alt="{name}"> {/icon}
+    {~s}{name}
+{/icon}
+{<badge}
+    <span class="jira-issue-status-lozenge aui-lozenge jira-issue-status-lozenge-{badgeColour} jira-issue-status-lozenge-new jira-issue-status-lozenge-max-width-medium" {+tooltip:name/}>{name}</span>
+{/badge}
+{<tooltip}
+    data-tooltip="<span class=&quot;jira-issue-status-tooltip-title&quot;>{.}</span>"
+{/tooltip}

@@ -1,0 +1,26 @@
+<h2>Edgescan Link{~s}{~s}<button class="aui-button aui-button-primary" id="edit-link">Edit</button></h2>
+<div class="aui-group">
+    <div class="aui-item">
+        {>"project-link/details":linkDetails/}
+    </div>
+    <div class="aui-item">
+        <div id="link-status">
+            <p> Link is currently {~s} {>"project-link/status"/} </p>
+
+            <br>
+
+            Last updated: {?linkDetails.lastUpdated}{linkDetails.lastUpdated}{:else}never{/linkDetails.lastUpdated}
+        </div>
+
+        <br>
+
+        <h2>Manual Import</h2>
+        <button id="import-updated" class="aui-button">Import Updated</button>
+        <button id="import-all" class="aui-button">Import All</button>
+        <div class="import-spinner"/>
+        {>"form/checkbox-input" name="test-mode" label="Test Mode"/}
+        <div class="result-container">
+            <div id="import-results"/>
+        </div>
+    </div>
+</div>

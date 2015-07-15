@@ -1,0 +1,27 @@
+<div id="project-config-devstatus" class="project-config-webpanel-content project-config-icon48-settings">
+    <div class="project-config-webpanel-help">
+        <p>Use Jira to keep track of your Edgescan vulnerabilities. Once linked to Edgescan, a new issue is created for each new vulnerability, and will be closed when the vulnerability is closed.</p>
+
+        <ul class="project-config-list project-config-datalist">
+            {?link}
+                <li>
+                    <span class="project-config-list-label">Configuration:</span>
+                    <span class="project-config-list-value"><a href="/jira/secure/ConfigureEdgescanProjectLink.jspa">{link.projectKey}: configure Edgescan link</a></span>
+                </li>
+                <li>
+                    <span class="project-config-list-label">Status:</span>
+                    <span class="project-config-list-value">{>"project-link/status"/}</span>
+                </li>
+                <li>
+                    <span class="project-config-list-label">Last updated:</span>
+                    <span class="project-config-list-value">{?linkDetails.lastUpdated}{linkDetails.lastUpdated}{:else}Never{/linkDetails.lastUpdated}</span>
+                </li>
+            {:else}
+                <li>
+                    <span class="project-config-list-label">Configuration:</span>
+                    <span class="project-config-list-value">No link, please <a href="/jira/secure/ConfigureEdgescanProjectLink.jspa">configure</a> one.</span>
+                </li>
+            {/link}
+        </ul>
+    </div>
+</div>

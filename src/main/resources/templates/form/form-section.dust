@@ -1,0 +1,8 @@
+<fieldset id="{name}">
+	{?title} 
+		<br>
+		<h4>{title}</h4> 
+	{/title}
+	{#inputs} {>"form/{type}-input"/} {/inputs}
+	{#sections} {>"form/form-section":./} {/sections}
+</fieldset>

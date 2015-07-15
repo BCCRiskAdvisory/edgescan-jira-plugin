@@ -1,0 +1,57 @@
+Finished {@eq key=testMode value="true" type="boolean"}testing{/eq} import of {importMode} vulnerabilities.
+<table class="aui">
+    <thead></thead>
+    <tbody>
+        <tr>
+            <td><b>Total vulnerabilities:</b></td>
+            <td><ul class="unstyled">
+                <li>Found:{totalFound}</li>
+                <li>Ignored:{totalIgnored}</li>
+                <li>Unchanged:{totalUnchanged}</li>
+                <li>Opened:{totalOpened}</li>
+                <li>Updated:{totalUpdated}</li>
+                <li>Closed:{totalClosed}</li>
+                <li>Failed:{totalFailed}</li>
+            </ul></td>
+        </tr>
+        {#breakdownByRisk}
+            <tr>
+                <td><b>Minimal</b></td>
+                {+importCount:minimal/}
+            </tr>
+            <tr>
+                <td><b>Low</b></td>
+                {+importCount:low/}
+            </tr>
+            <tr>
+                <td><b>Medium</b></td>
+                {+importCount:medium/}
+            </tr>
+            <tr>
+                <td><b>High</b></td>
+                {+importCount:high/}
+            </tr>
+            <tr>
+                <td><b>Critical</b></td>
+                {+importCount:critical/}
+            </tr>
+        {/breakdownByRisk}
+        <tr>
+            <td>Error Messages</td>
+            <td><ul class="unstyled">
+                {#errorMessages} <li>{.}</li> {/errorMessages}
+            </ul></td>
+        </tr>
+    </tbody>
+</table>
+{<importCount}
+    <td><ul class="unstyled">
+        <li>Found:{found}</li>
+        <li>Ignored:{ignored}</li>
+        <li>Unchanged:{unchanged}</li>
+        <li>Opened:{opened}</li>
+        <li>Updated:{updated}</li>
+        <li>Closed:{closed}</li>
+        <li>Failed:{failed}</li>
+    </ul></td>
+{/importCount}

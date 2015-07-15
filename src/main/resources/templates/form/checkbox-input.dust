@@ -1,0 +1,6 @@
+<div class="field-group">
+	<label for="{name}">{label}:</label>
+	<input type="checkbox" id="{name}" name="{name}" class="checkbox" 
+		{@eq key=value value="true" type="boolean"} checked {/eq}
+		>
+</div>

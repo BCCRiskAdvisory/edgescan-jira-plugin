@@ -1,0 +1,16 @@
+<form id="{name}" class="aui medium-label">
+	{#inputs}
+		{>"form/{type}-input"/}
+	{/inputs}
+	{#sections}
+		{>"form/form-section"/}
+	{/sections}
+	<div class="field-group">
+		{?submitText}
+			<input type="submit" value="{submitText}" class="button">
+		{/submitText}
+		{?cancelText}
+			<button id="cancel" class="aui-button aui-button-link">{cancelText}</button>
+		{/cancelText}
+	</div>
+</form>

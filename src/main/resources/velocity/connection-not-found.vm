@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <title>Edgescan Connection Not Configured</title>
+	
+    <meta name="decorator" content="atl.admin" />
+	<meta name="admin.active.section" content="atl.jira.proj.config"/>
+	<meta name="admin.active.tab" content="project-link-config-link"/>
+	
+    $webResourceManager.requireResourcesForContext("common-resources")
+	
+	<meta name="url" content="$applicationProperties.getBaseUrl()" />
+	<meta name="projectKey" content="$action.getSelectedProject().getKey()" />
+  </head>
+  <body>
+	<h1>
+		No Edgescan Connection Configured.
+    </h1>
+	<p>
+        No Edgescan connection has been configured. You will need to configure a connection 
+		<a href="/jira/secure/ConfigureEdgescanConnection.jspa">here</a> before linking this project to Edgescan.
+    </p>
+  </body>
+</html>

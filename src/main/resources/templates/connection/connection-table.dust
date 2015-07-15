@@ -1,0 +1,18 @@
+<table class="aui">
+	<h3>Connectors</h3>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Description</th>
+			<th>Url</th>
+			<th>Api Key</th>
+			<th></th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		{#connections}
+			{>connection-row/}
+		{/connections}
+	</tbody>
+</table>

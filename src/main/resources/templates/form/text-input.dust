@@ -1,0 +1,4 @@
+<div class="field-group">
+	<label for="{name}">{label}:</label>
+	<input type="text" id="{name}" name="{name}" class="text" {?value}value="{value}"{/value} {?disabled} disabled {/disabled}>
+</div>

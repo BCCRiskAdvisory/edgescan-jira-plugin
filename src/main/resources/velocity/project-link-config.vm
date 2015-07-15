@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>Edgescan Project Link</title>
+	
+    <meta name="decorator" content="atl.admin" />
+	<meta name="admin.active.section" content="atl.jira.proj.config"/>
+	<meta name="admin.active.tab" content="project-link-config-link"/>
+	
+    $webResourceManager.requireResourcesForContext("common-resources")
+	
+	<meta name="url" content="$applicationProperties.getBaseUrl()" />
+	<meta name="projectKey" content="$action.getSelectedProject().getKey()" />
+  </head>
+  <body>
+	<div id="alerts"></div>
+	<div id="project-link-container">
+	</div>
+  </body>
+</html>

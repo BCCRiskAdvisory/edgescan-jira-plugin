@@ -1,32 +1,143 @@
 <atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
-    <plugin-info>
-        <description>${project.description}</description>
-        <version>${project.version}</version>
-        <vendor name="${project.organization.name}" url="${project.organization.url}" />
-        <param name="plugin-icon">images/pluginIcon.png</param>
-        <param name="plugin-logo">images/pluginLogo.png</param>
-    </plugin-info>
+	<plugin-info>
+		<description>${project.description}</description>
+		<version>${project.version}</version>
+		<vendor name="${project.organization.name}" url="${project.organization.url}" />
+		<param name="plugin-icon">images/pluginIcon.png</param>
+		<param name="plugin-logo">images/pluginLogo.png</param>
+	</plugin-info>
 
-    <!-- add our i18n resource -->
-    <resource type="i18n" name="i18n" location="edgescan-jira-plugin"/>
-    
-    <!-- add our web resources -->
-    <web-resource key="edgescan-jira-plugin-resources" name="edgescan-jira-plugin Web Resources">
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        
-        <resource type="download" name="edgescan-jira-plugin.css" location="/css/edgescan-jira-plugin.css"/>
-        <resource type="download" name="edgescan-jira-plugin.js" location="/js/edgescan-jira-plugin.js"/>
-        <resource type="download" name="images/" location="/images"/>
+	<!-- add our i18n resource -->
+	<resource type="i18n" name="i18n" location="edgescan-jira-plugin-i18n" />
 
-        <context>edgescan-jira-plugin</context>
-    </web-resource>
-    
-    <!-- publish our component -->
-    <component key="myPluginComponent" class="com.bccriskadvisory.MyPluginComponentImpl" public="true">
-        <interface>com.bccriskadvisory.MyPluginComponent</interface>
-    </component>
-    
-    <!-- import from the product container -->
-    <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" />
-    
+	<!-- ------------------------------ Imports from Jira container and Shared Access Layer -------------------------------->
+	<component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" />
+
+	<component-import key="requestFactory" interface="com.atlassian.sal.api.net.RequestFactory" />
+	<component-import key="pluginScheduler" interface="com.atlassian.sal.api.scheduling.PluginScheduler" />
+	<component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher" />
+	
+	<component-import key="salUserManager" interface="com.atlassian.sal.api.user.UserManager" />
+	<component-import key="jiraUserManager" interface="com.atlassian.jira.user.util.UserManager" />
+	<component-import key="avatarService" interface="com.atlassian.jira.avatar.AvatarService" />
+	<component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider" />
+	
+	<component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" />
+	<component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" />
+
+	<component-import key="issueService" interface="com.atlassian.jira.bc.issue.IssueService" />
+	<component-import key="projectService" interface="com.atlassian.jira.bc.project.ProjectService" />
+	<component-import key="constantsManager" interface="com.atlassian.jira.config.ConstantsManager" />
+	<component-import key="workflowManager" interface="com.atlassian.jira.workflow.WorkflowManager" />
+	<component-import key="issueWorkflowManager" interface="com.atlassian.jira.workflow.IssueWorkflowManager" />
+	
+	<component-import key="activeObjectsService" interface="com.atlassian.activeobjects.external.ActiveObjects" />
+	<component key="tx-processor" name="Transactional Annotation Processor" class="com.atlassian.activeobjects.external.TransactionalAnnotationProcessor" />
+	
+	<!-- add to velocity contexts -->
+	<template-context-item key="app-props-item" component-ref="applicationProperties" context-key="applicationProperties"/>
+
+	<!-------------------------------- PLugin web resources -------------------------------->
+	
+	<web-resource key="common-resources">
+		<dependency>com.atlassian.auiplugin:ajs</dependency>
+		<dependency>com.atlassian.auiplugin:dialog2</dependency>
+		<dependency>com.atlassian.auiplugin:aui-experimental-iconfont</dependency>
+		<dependency>com.atlassian.auiplugin:aui-spinner</dependency>
+		<resource type="download" name="dust-core.min.js" location="dust-core.min.js" /> 
+		<resource type="download" name="dust-helpers.min.js" location="dust-helpers.min.js" /> 
+		<resource type="download" name="dust-templates.js" location="dust-templates.js" />
+		<resource type="download" name="es-plugin.js" location="es-plugin.js" />
+		<resource type="download" name="es-plugin.css" location="es-plugin.css" />
+		<context>common-resources</context>
+	</web-resource>
+	
+	<!-------------------------------- Plugin components -------------------------------->
+	
+	<component key="Plugin Context" class="com.bccriskadvisory.link.JiraPluginContext">
+		<description>Contains all components imported from the Jira container and Shared access layer, as well as components defined by this plugin.</description>
+	</component>
+	
+	<component key="Unified user manager" class="com.bccriskadvisory.jira.user.UnifiedUserManagerImpl">
+		<description>SAL and Jira both expose a UserManager, this component unifies the two</description>
+		<interface>com.bccriskadvisory.jira.user.UnifiedUserManager</interface>
+	</component>
+	
+	<component key="edgescanMonitor" class="com.bccriskadvisory.link.monitor.EdgescanMonitorImpl" system="true" public="true">
+		<description></description>
+		<interface>org.springframework.beans.factory.InitializingBean</interface>
+		<interface>org.springframework.beans.factory.DisposableBean</interface>
+		<interface>com.bccriskadvisory.link.monitor.EdgescanMonitor</interface>
+	</component>
+
+	<rest key="edgescan-link-rest" path="/eslink" version="1.0"/>
+
+	<ao key="active-object-module">
+		<entity>com.bccriskadvisory.jira.ao.connection.ConnectionEntity</entity>
+		<entity>com.bccriskadvisory.jira.ao.projectlink.ProjectLinkEntity</entity>
+		<entity>com.bccriskadvisory.jira.ao.vulnerabilitylink.VulnLinkEntity</entity>
+	</ao>
+	
+	<component key="Edgescan connection service" class="com.bccriskadvisory.jira.ao.connection.ConnectionServiceImpl">
+		<description>Active object service for Connections to edgescan</description>
+		<interface>com.bccriskadvisory.jira.ao.connection.ConnectionService</interface>
+	</component>
+	
+	<component key="Edgescan project link service" class="com.bccriskadvisory.jira.ao.projectlink.ProjectLinkServiceImpl">
+		<description>Active object service for links between individual projects and edgescan assets</description>
+		<interface>com.bccriskadvisory.jira.ao.projectlink.ProjectLinkService</interface>
+	</component>
+	
+	<component key="Edgescan vulnerability link service" class="com.bccriskadvisory.jira.ao.vulnerabilitylink.VulnerabilityLinkServiceImpl">
+		<description>Active object service for links between individual issues and edgescan vulnerabilities</description>
+		<interface>com.bccriskadvisory.jira.ao.vulnerabilitylink.VulnerabilityLinkService</interface>
+	</component>
+	
+	<!-------------------------------- Additions to the Jira GUI -------------------------------->
+
+	<webwork1 key="configure-es-link" name="Configure Edgescan Link" class="java.lang.Object">
+		<actions>
+			<action name="com.bccriskadvisory.link.ui.ProjectLinkConfigurationAction" alias="ConfigureEdgescanProjectLink" roles-required="admin">
+				<view name="success">velocity/project-link-config.vm</view>
+				<view name="connectionNotFound">velocity/connection-not-found.vm</view>
+			</action>
+			<action name="com.bccriskadvisory.link.ui.ConnectionConfigurationAction" alias="ConfigureEdgescanConnection" roles-required="admin">
+				<view name="success">velocity/connection-config.vm</view>
+			</action>
+		</actions>
+	</webwork1>
+	
+		<!-------------------------------- Admin area -------------------------------->
+		
+		<web-section key="es-connection-config" location="admin_plugins_menu">
+			<description>Edgescan section in plugin page sidebar</description>
+			<label key="eslink.section.label"/>
+		</web-section>
+	
+		<web-item key="es-connection-config-item" name="Configure Edgescan Connection" section="admin_plugins_menu/es-connection-config" weight="10" application="jira">
+			<description>Link to Edgescan Connection admin page.</description>
+			<label key="eslink.admin.label" />
+			<link>/secure/ConfigureEdgescanConnection.jspa</link>
+		</web-item>
+	
+		<!-------------------------------- Project configuration area -------------------------------->
+		
+		<web-section key="es-project-link" location="atl.jira.proj.config">
+			<description>Section in project configuration page sidebar</description>
+			<label key="eslink.section.label"/>
+		</web-section>
+		
+		<web-item key="es-project-link-config" name="Link to Edgescan" section="atl.jira.proj.config/es-project-link">
+			<description>Link to Project link configuration page</description>
+			<label key="eslink.project.link.config"/> 
+			<link>/secure/ConfigureEdgescanProjectLink.jspa</link>
+		</web-item>
+		
+		<web-panel key="es-project-link-summary" name="" location="webpanels.admin.summary.right-panels">
+			<description>Panel for project configuration summary page</description>
+	        <label key="eslink.project.link.summary"/>
+			<context-provider class="com.bccriskadvisory.link.ui.ProjectLinkSummaryContextProvider" />
+	        <resource name="view" type="velocity" location="velocity/project-link-summary.vm"/>
+		</web-panel>
+	
 </atlassian-plugin>

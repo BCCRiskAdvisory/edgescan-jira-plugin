@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <title>Edgescan Connection Configuration</title>
+    <meta name="decorator" content="atl.admin" />
+    $webResourceManager.requireResourcesForContext("common-resources")
+	<meta name="url" content="$applicationProperties.getBaseUrl()" />
+  </head>
+  <body>
+	<div id="connection-config-container">
+    	<div id="alerts"></div>
+      	<div id="form"></div>
+    	<div id="connection-table"></div>
+    	<div id="dialog-container"></div>
+    </div>
+  </body>
+</html>

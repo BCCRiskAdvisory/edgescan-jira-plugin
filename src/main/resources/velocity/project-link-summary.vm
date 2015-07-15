@@ -1,0 +1,3 @@
+<div id="es-project-link-summary-container">
+    $webResourceManager.requireResourcesForContext("common-resources")
+</div>

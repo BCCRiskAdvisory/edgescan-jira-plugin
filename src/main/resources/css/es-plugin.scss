@@ -1,0 +1,26 @@
+$border: #B8B8B8;
+
+.unstyled {
+	ul, li {
+		padding: 0;
+		margin: 0;
+		list-style: none;
+	}
+}
+
+#link-status {
+	text-align: center;
+}
+
+.result-container {
+	padding: 5px;
+
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 10px;
+	border-color: $border;
+	
+	overflow-y: auto;
+	max-height: 400px;
+	min-height: 400px;
+}

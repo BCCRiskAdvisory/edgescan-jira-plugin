@@ -1,0 +1,9 @@
+{@eq key=link.isEnabled value="true" type="boolean"}
+    <span class="aui-lozenge aui-lozenge-success enabled"> Enabled </span>
+    {~s}
+    <button class="aui-button aui-button-subtle" id="enable-disable">(disable)</button>
+{:else}
+    <span class="aui-lozenge aui-lozenge-error enabled"> Disabled </span>
+    {~s}
+    <button class="aui-button aui-button-subtle" id="enable-disable">(enable)</button>
+{/eq}
