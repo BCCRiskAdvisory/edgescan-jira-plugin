@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2015 BCC Risk Advisory (info@bccriskadvisory.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 (function(dust){dust.register("connection\/connection-row",body_0);function body_0(chk,ctx){return chk.w("<tr data_id=\"").f(ctx.get(["ID"], false),ctx,"h").w("\"><td>").f(ctx.get(["name"], false),ctx,"h").w("</td><td>").f(ctx.get(["description"], false),ctx,"h").w("</td><td>").f(ctx.get(["url"], false),ctx,"h").w("</td><td>").f(ctx.get(["apiKey"], false),ctx,"h").w("</td><td>").h("eq",ctx,{"else":body_1,"block":body_2},{"key":ctx.get(["isEnabled"], false),"value":"true","type":"boolean"},"h").w("</td><td><button data_id=\"").f(ctx.get(["ID"], false),ctx,"h").w("\" class=\"aui-button test\">Test</button><button data_id=\"").f(ctx.get(["ID"], false),ctx,"h").w("\" class=\"aui-button edit\">Edit</button><button data_id=\"").f(ctx.get(["ID"], false),ctx,"h").w("\" class=\"aui-button delete\">Delete</button></td></tr>");}body_0.__dustBody=!0;function body_1(chk,ctx){return chk.w("<span data_id=\"").f(ctx.get(["ID"], false),ctx,"h").w("\" class=\"aui-lozenge aui-lozenge-error enabled\"> Disabled </span>");}body_1.__dustBody=!0;function body_2(chk,ctx){return chk.w("<span data_id=\"").f(ctx.get(["ID"], false),ctx,"h").w("\" class=\"aui-lozenge aui-lozenge-success enabled\"> Enabled </span>");}body_2.__dustBody=!0;return body_0}(dust));
 (function(dust){dust.register("connection\/connection-table",body_0);function body_0(chk,ctx){return chk.w("<table class=\"aui\"><h3>Connectors</h3><thead><tr><th>Name</th><th>Description</th><th>Url</th><th>Api Key</th><th></th><th></th></tr></thead><tbody>").s(ctx.get(["connections"], false),ctx,{"block":body_1},{}).w("</tbody></table>");}body_0.__dustBody=!0;function body_1(chk,ctx){return chk.p("connection-row",ctx,ctx,{});}body_1.__dustBody=!0;return body_0}(dust));
 (function(dust){dust.register("form\/checkbox-input",body_0);function body_0(chk,ctx){return chk.w("<div class=\"field-group\"><label for=\"").f(ctx.get(["name"], false),ctx,"h").w("\">").f(ctx.get(["label"], false),ctx,"h").w(":</label><input type=\"checkbox\" id=\"").f(ctx.get(["name"], false),ctx,"h").w("\" name=\"").f(ctx.get(["name"], false),ctx,"h").w("\" class=\"checkbox\" ").h("eq",ctx,{"block":body_1},{"key":ctx.get(["value"], false),"value":"true","type":"boolean"},"h").w("></div>");}body_0.__dustBody=!0;function body_1(chk,ctx){return chk.w(" checked ");}body_1.__dustBody=!0;return body_0}(dust));
