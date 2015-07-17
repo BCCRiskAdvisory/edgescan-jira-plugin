@@ -12,7 +12,7 @@
 	</thead>
 	<tbody>
 		{#connections}
-			{>connection-row/}
+			{>"connection/connection-row"/}
 		{/connections}
 	</tbody>
 </table>

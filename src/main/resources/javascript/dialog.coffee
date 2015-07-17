@@ -1,17 +1,15 @@
-showDialog = (header, body) ->
-  id = "dialog"
-  buildStructure = () ->
+showDialog = (title, body) ->
+  id = "esj-dialog"
+  dialogStructure = 
     {
-      header: header
+      title: title
       body: body
       id: id
     }
 
-  dust.stream 'dialog', buildStructure()
-    .on "data", (html) ->
-      $("#dialog-container").append(html)
-    .on "end", () ->
-      dialog = AJS.dialog2("##{id}")
-      dialog.show()
-      $("#dialog-close-button").click () -> 
-        dialog.hide()
+  dust.render 'common/dialog', dialogStructure, (err, html) ->
+    $("#dialog-container").append(html)
+    dialog = AJS.dialog2("##{id}")
+    dialog.show()
+    $("#dialog-close-button").click () -> 
+      dialog.hide()

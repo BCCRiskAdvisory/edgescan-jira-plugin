@@ -28,10 +28,12 @@ import javax.ws.rs.core.Response.Status;
 import com.atlassian.jira.user.ApplicationUser;
 import com.bccriskadvisory.jira.user.UnifiedUserManager;
 import com.bccriskadvisory.link.JiraPluginContext;
+import com.bccriskadvisory.link.rest.PluginError;
 import com.bccriskadvisory.link.rest.PluginResponse;
 import com.bccriskadvisory.link.rest.form.components.FormStructure;
+import com.bccriskadvisory.link.utility.AbstractLogSupported;
 
-public abstract class AbstractRestResource {
+public abstract class AbstractRestResource extends AbstractLogSupported {
 
 	private UnifiedUserManager userManager;
 
@@ -66,16 +68,20 @@ public abstract class AbstractRestResource {
 	protected Response respondNotFound() {
 		return Response.serverError().status(Status.NOT_FOUND).build();
 	}
-
-	protected Response respondError() {
-		return Response.serverError().build();
+	
+	protected Response respondError(String type, String message) {
+		return respond(new PluginResponse().withError(new PluginError(type, message)));
+	}
+	
+	protected Response respondException(Exception e) {
+		return respond(new PluginResponse().withException(e));
 	}
 
 	protected Response respondOk() {
 		return Response.ok().build();
 	}
 
-	protected Response respondOk(final PluginResponse response) {
+	protected Response respond(final PluginResponse response) {
 		return Response.ok(response.toString(), MediaType.APPLICATION_JSON).build();
 	}
 
@@ -84,7 +90,7 @@ public abstract class AbstractRestResource {
 	public Response form(@Context final HttpServletRequest request) {
 		if (notAuthed(request)) return noAuthResponse(request);
 		
-		return respondOk(new PluginResponse().withFormStructure(getFormStructure(request)));
+		return respond(new PluginResponse().withFormStructure(getFormStructure(request)));
 	}
 	
 	protected abstract FormStructure getFormStructure(final HttpServletRequest request);

@@ -27,8 +27,10 @@ import com.atlassian.jira.bc.ServiceResult;
 import com.bccriskadvisory.jira.ao.connection.Connection;
 import com.bccriskadvisory.jira.ao.projectlink.ProjectLink;
 import com.bccriskadvisory.link.JiraPluginContext;
+import com.bccriskadvisory.link.connector.EdgescanConnectionException;
 import com.bccriskadvisory.link.connector.EdgescanV1Connector;
 import com.bccriskadvisory.link.connector.EdgescanV1Connector.RequestBuilder;
+import com.bccriskadvisory.link.rest.PluginError;
 import com.bccriskadvisory.link.rest.edgescan.Risk;
 import com.bccriskadvisory.link.rest.edgescan.Vulnerability;
 import com.bccriskadvisory.link.utility.AbstractLogSupported;
@@ -74,13 +76,17 @@ public class ProjectLinkImportProcessor extends AbstractLogSupported {
 		//We avoid missing such vulnerabilities by taking our update time to be *before* retrieving them.
 		updatedAt = now();
 		
-		final Optional<List<Vulnerability>> vulnerabilities = getVulnerabilitiesToImport();
-		
-		if (vulnerabilities.isPresent() && !vulnerabilities.get().isEmpty()) {
-			processVulnerabilities(vulnerabilities.get());
-			setProjectLinkLastUpdated();
+		try {
+			Optional<List<Vulnerability>> vulnerabilities = getVulnerabilitiesToImport();
+			
+			if (vulnerabilities.isPresent() && !vulnerabilities.get().isEmpty()) {
+				processVulnerabilities(vulnerabilities.get());
+				setProjectLinkLastUpdated();
+			}
+		} catch (EdgescanConnectionException e) {
+			getLog().error("Unable to get vulnerabilities for import", e);
+			importResults.addError(new PluginError(e));
 		}
-		
 		return importResults;
 	}
 
@@ -146,7 +152,7 @@ public class ProjectLinkImportProcessor extends AbstractLogSupported {
 		}
 	}
 	
-	private Optional<List<Vulnerability>> getVulnerabilitiesToImport() {
+	private Optional<List<Vulnerability>> getVulnerabilitiesToImport() throws EdgescanConnectionException {
 		final RequestBuilder vulnerabilityRequest = connector.vulnerabilities();
 		vulnerabilityRequest.stringQuery("asset_id_in", Joiner.on(",").join(link.getAssets()));
 		
@@ -167,8 +173,8 @@ public class ProjectLinkImportProcessor extends AbstractLogSupported {
 	private Optional<ServiceResult> recordValidationErrors(Optional<ServiceResult> result) {
 		if (result.isPresent() && !result.get().isValid()) {
 			for (Entry<String, String> error : result.get().getErrorCollection().getErrors().entrySet()) {
-				final String errorString = String.format("Vulnerability import failed on [%s], because [%s]", error.getKey(), error.getValue());
-				importResults.addError(errorString);
+				final String errorString = String.format("Import failed on [%s], because [%s]", error.getKey(), error.getValue());
+				importResults.addError(new PluginError("Import failed", errorString));
 				getLog().error(errorString);
 			}
 		}

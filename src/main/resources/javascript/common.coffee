@@ -28,7 +28,7 @@ inputValue = (key) ->
           input.find("option:selected").attr("value")
 
 ajax_call = (method) -> 
-  (url, data, onComplete = nop, onError = nop ) ->
+  (url, data, onComplete, onError = nop) ->
     AJS.$.ajax {
       url: url
       type: method
@@ -56,5 +56,12 @@ optionSelected = (chunk, context) ->
   else
     chunk.write "selected" if "#{selected}" == value
 
-renderErrors = (messages) ->
-  AJS.messages.error("#alerts", {title: "Validation failed", body: message}) for message in messages
+responseHandler = (handler) ->
+  (response) ->
+    if response and response.errorMessages.length
+      renderErrors response.errorMessages
+    else
+      handler response
+
+renderErrors = (errors) ->
+  AJS.messages.error("#alerts", {title: error.type, body: error.message}) for error in errors

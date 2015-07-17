@@ -24,7 +24,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import net.java.ao.Entity;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
-import com.bccriskadvisory.jira.ao.projectlink.ProjectLinkEntity;
 
 public abstract class ActiveObjectsServiceImpl<E extends Entity, T extends PluginObject<E>> implements ActiveObjectsService<T> {
 

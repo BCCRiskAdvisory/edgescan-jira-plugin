@@ -41,16 +41,13 @@ do (baseUrl = "/jira/rest/eslink/1.0/connections", paramNames = ['ID', 'name', '
     e.preventDefault()
     id = $(this).find("#ID").attr("value")
 
-    put idUrl(id), buildParams(paramNames), (response) ->
-      if response.errorMessages
-        renderErrors response.errorMessages
-      else 
-        dust.render 'connection/connection-row', response.connection, (err, html) ->
-            elementById("tr", id).replaceWith(html)
-            elementById(".edit", id).click editListener
-            elementById(".delete", id).click deleteListener
-            elementById(".test", id).click testListener
-            populateForm()
+    put idUrl(id), buildParams(paramNames), responseHandler (response) ->
+      dust.render 'connection/connection-row', response.connection, (err, html) ->
+          elementById("tr", id).replaceWith(html)
+          elementById(".edit", id).click editListener
+          elementById(".delete", id).click deleteListener
+          elementById(".test", id).click testListener
+          populateForm()
 
   editListener = () ->
     id = AJS.$(this).attr("data_id")
@@ -60,7 +57,9 @@ do (baseUrl = "/jira/rest/eslink/1.0/connections", paramNames = ['ID', 'name', '
       dust.render 'form/form', formData, (err, html) ->
           replaceFormElement(html)
           AJS.$("#connection-form").submit updateListener
-          AJS.$("#connection-form #cancel").click populateForm
+          AJS.$("#connection-form #cancel").click (e) ->
+            e.preventDefault()
+            populateForm()
 
   deleteListener = () ->
     id = AJS.$(this).attr("data_id")
@@ -69,8 +68,12 @@ do (baseUrl = "/jira/rest/eslink/1.0/connections", paramNames = ['ID', 'name', '
 
   testListener = () ->
     id = $(this).attr("data_id")
-    get "#{idUrl(id)}/test", {}, (response) ->
-      showDialog "Test successful", 
+    get "#{idUrl(id)}/test", {}, (response) -> 
+      if response && response.errorMessages.length
+        error = response.errorMessages[0]
+        showDialog error.type, error.message
+      else
+        showDialog "Test successful", "Successfully connected to Edgescan"
 
   replaceFormElement = (html) ->
     AJS.$("#form").empty()

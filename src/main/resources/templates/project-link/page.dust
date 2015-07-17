@@ -6,7 +6,7 @@
     <div class="aui-item">
         <div id="link-status">
             <p> Link is currently {~s} {>"project-link/status"/} </p>
-
+            
             <br>
 
             Last updated: {?linkDetails.lastUpdated}{linkDetails.lastUpdated}{:else}never{/linkDetails.lastUpdated}

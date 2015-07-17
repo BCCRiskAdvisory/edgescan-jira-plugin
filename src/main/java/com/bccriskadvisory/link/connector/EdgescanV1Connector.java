@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Request.MethodType;
 import com.atlassian.sal.api.net.RequestFactory;
+import com.atlassian.sal.api.net.ResponseException;
 import com.bccriskadvisory.jira.ao.connection.Connection;
 import com.bccriskadvisory.link.rest.edgescan.EdgescanResponse;
 import com.bccriskadvisory.link.rest.gson.GsonObject;
@@ -65,11 +66,7 @@ public class EdgescanV1Connector {
 		return new RequestBuilder(ASSET_ENDPOINT);
 	}
 	
-	public EdgescanResponse test() {
-		return assets().execute();
-	}
-	
-	protected EdgescanResponse execute(final String url) {
+	protected EdgescanResponse execute(final String url) throws EdgescanConnectionException {
 		Request<?> request = requestFactory.createRequest(MethodType.GET, url);
 		
 		request.addHeader("X-API-Token", connection.getApiKey());
@@ -77,9 +74,9 @@ public class EdgescanV1Connector {
 		try (TimedTask task = new TimedTask("Making request to edgescan: " + url)){
 			final String response = request.execute();
 			return GsonObject.fromJson(response, EdgescanResponse.class);
-		} catch(final Exception e) {
-			return new EdgescanResponse();
-		}
+		} catch (ResponseException e) {
+			throw new EdgescanConnectionException("Unable to communicate with edgescan - " + e.getMessage(), e);
+		} 
 	}
 	
 	public class RequestBuilder {
@@ -125,7 +122,7 @@ public class EdgescanV1Connector {
 			
 			urlBuilder.append(endpoint);
 			
-			if (json && id != null) {
+			if (id != null) {
 				urlBuilder.append("/").append(id);
 			}
 			
@@ -134,13 +131,7 @@ public class EdgescanV1Connector {
 			}
 			
 			if (!queryMap.isEmpty()) {
-				urlBuilder.append("?c");
-				
-				if (json) {
-					urlBuilder.append(Joiner.on("&c").withKeyValueSeparator("=").join(queryMap));
-				} else {
-					urlBuilder.append(urlEncodedQueryString());
-				}
+				urlBuilder.append("?c").append(urlEncodedQueryString());
 			}
 			
 			return urlBuilder.toString();
@@ -164,7 +155,7 @@ public class EdgescanV1Connector {
 			return URLEncoder.encode(string, "UTF-8");
 		}
 		
-		public EdgescanResponse execute() {
+		public EdgescanResponse execute() throws EdgescanConnectionException {
 			return EdgescanV1Connector.this.execute(getJsonUrl());
 		}
 	}

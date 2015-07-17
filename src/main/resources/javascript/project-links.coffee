@@ -1,6 +1,6 @@
 do (baseUrl = "/jira/rest/eslink/1.0/links") ->
   AJS.toInit ->
-    initPage() if root()
+    initPage() if root().length
 
   initPage = ->
     get projectUrl(), {}, renderLink, editLink
@@ -29,21 +29,17 @@ do (baseUrl = "/jira/rest/eslink/1.0/links") ->
           root().find("#project-link-form").submit createListener
         else 
           root().find("#project-link-form").submit updateListener
-          root().find("#cancel").click initPage
+          root().find("#cancel").click (e) ->
+            e.preventDefault()
+            initPage()
 
   createListener = (e) ->
     e.preventDefault()
-    post baseUrl, linkParams(), processCreateUpdateResult
+    post baseUrl, linkParams(), responseHandler(renderLink)
 
   updateListener = (e) ->
     e.preventDefault()
-    put projectUrl(), linkParams(), processCreateUpdateResult
-
-  processCreateUpdateResult = (response) ->
-    if response.errorMessages
-      renderErrors response.errorMessages
-    else
-      renderLink response
+    put projectUrl(), linkParams(), responseHandler(renderLink)
 
   updateForm = () ->
     link = linkParams()

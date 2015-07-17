@@ -15,18 +15,22 @@
  */
 package com.bccriskadvisory.jira.ao.validation;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class ValidationResult {
-	private List<String> messages = new ArrayList<>();
+import com.bccriskadvisory.link.rest.PluginError;
+import com.google.common.collect.Lists;
 
-	public List<String> getMessages() {
+public class ValidationResult {
+	
+	private static final String VALIDATION_ERR = "Validation Failed";
+	private List<PluginError> messages = Lists.newArrayList();
+
+	public List<PluginError> getErrors() {
 		return messages;
 	}
 
 	public void addMessage(String message) {
-		this.messages.add(message);
+		this.messages.add(new PluginError(VALIDATION_ERR, message));
 	}
 	
 	public boolean isValid() {

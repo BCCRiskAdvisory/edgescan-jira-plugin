@@ -16,6 +16,7 @@
 package com.bccriskadvisory.link.rest;
 
 import java.util.List;
+import java.util.Map;
 
 import com.bccriskadvisory.jira.ao.PluginObject;
 import com.bccriskadvisory.jira.ao.connection.Connection;
@@ -24,6 +25,7 @@ import com.bccriskadvisory.link.processor.ImportResults;
 import com.bccriskadvisory.link.rest.form.components.FormStructure;
 import com.bccriskadvisory.link.rest.gson.GsonObject;
 import com.bccriskadvisory.link.rest.projectlink.ProjectLinkDetails;
+import com.google.common.collect.Lists;
 
 @SuppressWarnings("unused")
 public class PluginResponse extends GsonObject {
@@ -39,7 +41,7 @@ public class PluginResponse extends GsonObject {
 	
 	private ImportResults importResults;
 	
-	private List<String> errorMessages;
+	private List<PluginError> errorMessages = Lists.newArrayList();
 	
 	public PluginResponse withFormStructure(FormStructure form) {
 		this.form = form;
@@ -75,9 +77,19 @@ public class PluginResponse extends GsonObject {
 		this.importResults = importResults;
 		return this;
 	}
+	
+	public PluginResponse withError(PluginError error) {
+		this.errorMessages.add(error);
+		return this;
+	}
 
-	public PluginResponse withErrorMessages(List<String> messages) {
-		this.errorMessages = messages;
+	public PluginResponse withErrors(List<PluginError> errors) {
+		this.errorMessages.addAll(errors);
+		return this;
+	}
+	
+	public PluginResponse withException(Exception exception) {
+		this.errorMessages.add(new PluginError(exception));
 		return this;
 	}
 }

@@ -18,6 +18,7 @@ package com.bccriskadvisory.link.rest.resource;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -37,9 +38,10 @@ import com.bccriskadvisory.jira.ao.connection.ConnectionService;
 import com.bccriskadvisory.jira.ao.connection.ConnectionValidator;
 import com.bccriskadvisory.jira.ao.validation.ValidationResult;
 import com.bccriskadvisory.link.JiraPluginContext;
+import com.bccriskadvisory.link.connector.EdgescanConnectionException;
 import com.bccriskadvisory.link.connector.EdgescanV1Connector;
 import com.bccriskadvisory.link.rest.PluginResponse;
-import com.bccriskadvisory.link.rest.edgescan.EdgescanResponse;
+import com.bccriskadvisory.link.rest.edgescan.Asset;
 import com.bccriskadvisory.link.rest.form.ConnectionForm;
 import com.bccriskadvisory.link.rest.form.components.FormStructure;
 import com.bccriskadvisory.link.rest.gson.GsonObject;
@@ -65,7 +67,7 @@ public class ConnectionRestResource extends AbstractRestResource {
 		
 		final List<Connection> all = connectionService.index();
 		
-		return respondOk(new PluginResponse().withConnections(all));
+		return respond(new PluginResponse().withConnections(all));
 	}
 	
 	@GET
@@ -79,7 +81,7 @@ public class ConnectionRestResource extends AbstractRestResource {
 			return respondNotFound();
 		} else {
 			final FormStructure formStructure = getFormStructure(request);
-			return respondOk(new PluginResponse().withConnection(connection).withFormStructure(formStructure));
+			return respond(new PluginResponse().withConnection(connection).withFormStructure(formStructure));
 		}
 	}
 	
@@ -95,11 +97,16 @@ public class ConnectionRestResource extends AbstractRestResource {
 		} else {
 			final EdgescanV1Connector connector = new EdgescanV1Connector(requestFactory, found);
 			
-			final EdgescanResponse response = connector.test();
-			if (response.getAssets().isPresent()) {
-				return respondOk();
-			} else {
-				return respondError();
+			try {
+				final Optional<List<Asset>> assets = connector.assets().execute().getAssets();
+				if (assets.isPresent() && !assets.get().isEmpty()) {
+					return respondOk();
+				} else {
+					return respondError("Configuration Error", String.format("No assets were found using the edgescan connector" + found.getName()));
+				}
+			} catch (EdgescanConnectionException e) {
+				getLog().error("Unable to test edgescan connector", e);
+				return respondException(e);
 			}
 		}
 	}
@@ -111,17 +118,13 @@ public class ConnectionRestResource extends AbstractRestResource {
 		Connection newConnection = GsonObject.fromJson(body, Connection.class);
 		final ValidationResult validation = connectionValidator.validate(newConnection);
 
-		try {
-			if(validation.isValid()) {
-				connectionValidator.normalize(newConnection);
-				newConnection = connectionService.create(newConnection);
+		if(validation.isValid()) {
+			connectionValidator.normalize(newConnection);
+			newConnection = connectionService.create(newConnection);
 
-				return respondOk(new PluginResponse().withConnection(newConnection));
-			} else {
-				return respondOk(new PluginResponse().withErrorMessages(validation.getMessages()));
-			}
-		} catch (final Exception e) {
-			return respondError();
+			return respond(new PluginResponse().withConnection(newConnection));
+		} else {
+			return respond(new PluginResponse().withErrors(validation.getErrors()));
 		}
 	}
 	
@@ -136,9 +139,9 @@ public class ConnectionRestResource extends AbstractRestResource {
 		if (validation.isValid()) {
 			final Connection updated = connectionService.update(connection);
 			
-			return respondOk(new PluginResponse().withConnection(updated));
+			return respond(new PluginResponse().withConnection(updated));
 		} else {
-			return respondOk(new PluginResponse().withErrorMessages(validation.getMessages()));
+			return respond(new PluginResponse().withErrors(validation.getErrors()));
 		}
 	}
 	
@@ -155,7 +158,7 @@ public class ConnectionRestResource extends AbstractRestResource {
 			if (connectionService.delete(connection)) {
 				return respondOk();
 			} else {
-				return respondError();
+				return respondError("Action failed", "Unable to delete connection: " + connection.getName());
 			}
 		}
 	}

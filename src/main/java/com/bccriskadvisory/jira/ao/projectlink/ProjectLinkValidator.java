@@ -15,6 +15,8 @@
  */
 package com.bccriskadvisory.jira.ao.projectlink;
 
+import java.util.List;
+
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.status.Status;
 import com.atlassian.jira.user.ApplicationUser;
@@ -26,14 +28,17 @@ import com.google.common.base.Strings;
 public class ProjectLinkValidator {
 	
 	private JiraPluginContext pluginContext;
+	private boolean isCreate;
 
-	public ProjectLinkValidator(JiraPluginContext pluginContext) {
+	public ProjectLinkValidator(JiraPluginContext pluginContext, boolean isCreate) {
 		this.pluginContext = pluginContext;
+		this.isCreate = isCreate;
 	}
 
 	public ValidationResult validate(ProjectLink link) {
 		final ValidationResult validationResult = new ValidationResult();
 		
+		validateUniqueness(link,validationResult);
 		validateConnection(link, validationResult);
 		validateAssets(link, validationResult);
 		validateUser(link, validationResult);
@@ -42,6 +47,16 @@ public class ProjectLinkValidator {
 		validateCloseStatus(link, validationResult);
 		
 		return validationResult;
+	}
+	
+	private void validateUniqueness(ProjectLink link, ValidationResult validationResult) {
+		if (isCreate) {
+			final List<ProjectLink> links = pluginContext.getProjectLinkService().findBy("PROJECT_KEY = ?", link.getProjectKey());
+			
+			if (!links.isEmpty()) {
+				validationResult.addMessage("A link already exists for this project.");
+			}
+		}
 	}
 	
 	private void validateConnection(ProjectLink link, ValidationResult validationResult) {
@@ -59,7 +74,7 @@ public class ProjectLinkValidator {
 	}
 	
 	private void validateAssets(ProjectLink link, ValidationResult validationResult) {
-		if (link.getAssets().isEmpty()) {
+		if (link.getAssets() == null || link.getAssets().isEmpty()) {
 			validationResult.addMessage("No Edgescan assets selected");
 		}
 	}

@@ -17,10 +17,6 @@ package com.bccriskadvisory.link.rest.resource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,31 +31,21 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.pegdown.PegDownProcessor;
-import org.pegdown.ast.RootNode;
-
 import com.atlassian.jira.user.ApplicationUser;
-import com.bccriskadvisory.jira.ao.connection.Connection;
 import com.bccriskadvisory.jira.ao.projectlink.ProjectLink;
 import com.bccriskadvisory.jira.ao.projectlink.ProjectLinkServiceImpl;
 import com.bccriskadvisory.jira.ao.projectlink.ProjectLinkValidator;
 import com.bccriskadvisory.jira.ao.validation.ValidationResult;
 import com.bccriskadvisory.link.JiraPluginContext;
-import com.bccriskadvisory.link.connector.EdgescanV1Connector;
-import com.bccriskadvisory.link.connector.EdgescanV1Connector.RequestBuilder;
-import com.bccriskadvisory.link.processor.ProjectLinkImportProcessor;
+import com.bccriskadvisory.link.connector.EdgescanConnectionException;
 import com.bccriskadvisory.link.processor.ImportResults;
-import com.bccriskadvisory.link.processor.ConfluenceWikiMarkupSerializer;
+import com.bccriskadvisory.link.processor.ProjectLinkImportProcessor;
 import com.bccriskadvisory.link.rest.PluginResponse;
-import com.bccriskadvisory.link.rest.edgescan.EdgescanResponse;
-import com.bccriskadvisory.link.rest.edgescan.Vulnerability;
-import com.bccriskadvisory.link.rest.edgescan.VulnerabilityDetails;
 import com.bccriskadvisory.link.rest.form.ProjectLinkForm;
 import com.bccriskadvisory.link.rest.form.components.FormStructure;
 import com.bccriskadvisory.link.rest.gson.GsonObject;
 import com.bccriskadvisory.link.rest.projectlink.ProjectLinkDetails;
 import com.bccriskadvisory.link.rest.projectlink.ProjectLinkTranslator;
-import com.google.common.collect.Lists;
 import com.google.gson.JsonSyntaxException;
 
 @Path("links")
@@ -81,7 +67,7 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 		
 		final List<ProjectLink> allLinks = projectLinkService.index();
 		
-		return respondOk(new PluginResponse().withLinks(allLinks));
+		return respond(new PluginResponse().withLinks(allLinks));
 	}
 	
 	@GET
@@ -104,9 +90,15 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 		if (notAuthed(request)) return noAuthResponse(request);
 		
 		final ProjectLink link = getLinkByProjectKey(key).orElse(new ProjectLink(key));
-		final FormStructure form = new ProjectLinkForm(pluginContext).withLink(link).build();
-		
-		return respondOk(new PluginResponse().withLink(link).withFormStructure(form));
+		FormStructure form;
+		try {
+			form = new ProjectLinkForm(pluginContext).withLink(link).build();
+			
+			return respond(new PluginResponse().withLink(link).withFormStructure(form));
+		} catch (EdgescanConnectionException e) {
+			getLog().error("Unable to build form for link for project " + key);
+			return respondException(e);
+		}
 	}
 	
 	@POST
@@ -116,17 +108,17 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 		final Optional<ProjectLink> newLink = getLinkFromBody(body);
 		
 		if (newLink.isPresent()) {
-			ValidationResult validation = new ProjectLinkValidator(pluginContext).validate(newLink.get());
+			ValidationResult validation = new ProjectLinkValidator(pluginContext, true).validate(newLink.get());
 			
 			if (validation.isValid()) {
 				final ProjectLink created = projectLinkService.create(newLink.get());
 			
 				return linkWithDetails(request, created);
 			} else {
-				return respondOk(new PluginResponse().withErrorMessages(validation.getMessages()));
+				return respond(new PluginResponse().withErrors(validation.getErrors()));
 			}
 		} else {
-			return respondError();
+			return respondError("Invalid Input", "An invalid project link was provided.");
 		}
 	}
 	
@@ -138,17 +130,17 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 		final Optional<ProjectLink> updatedLink = getLinkFromBody(body);
 		
 		if (updatedLink.isPresent()) {
-			ValidationResult validation = new ProjectLinkValidator(pluginContext).validate(updatedLink.get());
+			ValidationResult validation = new ProjectLinkValidator(pluginContext, false).validate(updatedLink.get());
 			
 			if (validation.isValid()) {
 				final ProjectLink updated = projectLinkService.update(updatedLink.get());
 				
 				return linkWithDetails(request, updated);
 			} else {
-				return respondOk(new PluginResponse().withErrorMessages(validation.getMessages()));
+				return respond(new PluginResponse().withErrors(validation.getErrors()));
 			}
 		} else {
-			return respondError();
+			return respondError("Invalid Input", "An invalid project link was provided.");
 		}
 	}
 	
@@ -186,9 +178,9 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 				processor.initWithLink(projectLink.get());
 				final ImportResults importResults = processor.processImport();
 				
-				return respondOk(new PluginResponse().withImportResults(importResults));
+				return respond(new PluginResponse().withImportResults(importResults));
 			} else {
-				return respondError();
+				return respondError("Invalid Input", "Unrecognized import mode.");
 			}
 		} else {
 			return respondNotFound();
@@ -203,41 +195,18 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 		final Optional<ProjectLink> linkFromBody = getLinkFromBody(body);
 		
 		if (linkFromBody.isPresent()) {
-			final FormStructure form = new ProjectLinkForm(pluginContext).withLink(linkFromBody.get()).build();
-			
-			return respondOk(new PluginResponse().withFormStructure(form));
+			FormStructure form;
+			try {
+				form = new ProjectLinkForm(pluginContext).withLink(linkFromBody.get()).build();
+				
+				return respond(new PluginResponse().withFormStructure(form));
+			} catch (EdgescanConnectionException e) {
+				getLog().error("Unable to build form for link for project " + linkFromBody.get().getProjectKey());
+				return respondException(e);
+			}
 		} else {
-			return respondError();
+			return respondError("Invalid Input", "An invalid project link was provided.");
 		}
-	}
-	
-	@GET
-	@Path("parse/{id}")
-	public Response testParse(@PathParam("id") final String id) {
-		return details(id);
-	}
-
-	private Response details(String id) {
-		PegDownProcessor pegDownProcessor = new PegDownProcessor();
-		
-		Connection connection = pluginContext.getConnectionService().index().get(0);
-		EdgescanV1Connector connector = new EdgescanV1Connector(pluginContext.getRequestFactory(), connection);
-
-		EdgescanResponse vres = connector.vulnerabilities().withId(Integer.valueOf(id)).execute();
-		Vulnerability detailedV = vres.getDetailedVulnerability().get();
-		List<ParseResult> response = Lists.newArrayList(); 
-			
-		for (VulnerabilityDetails details : detailedV.getDetails().get()) {
-			ParseResult parseResult = new ParseResult();
-			parseResult.setMarkdown(details.getSrc());
-			parseResult.setHtml(details.getHtml());
-			RootNode markdown = pegDownProcessor.parseMarkdown(details.getSrc().toCharArray());
-			String wikiMarkup = new ConfluenceWikiMarkupSerializer().toWikiMarkup(markdown);
-			parseResult.setMarkup(wikiMarkup);
-			response.add(parseResult);
-		}
-		
-		return Response.ok(response.toString(), MediaType.APPLICATION_JSON).build();
 	}
 	
 	private Optional<ProjectLink> getLinkFromBody(final String body) {
@@ -258,9 +227,15 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 	
 	private Response linkWithDetails(final HttpServletRequest request, final ProjectLink link) {
 		final Optional<ApplicationUser> user = pluginContext.getUserManager().getUser(request);
-		final ProjectLinkDetails detail = new ProjectLinkTranslator(pluginContext).detail(link, user.get());
 		
-		return respondOk(new PluginResponse().withLink(link).withLinkDetails(detail));
+		ProjectLinkDetails detail;
+		try {
+			detail = new ProjectLinkTranslator(pluginContext).detail(link, user.get());
+			return respond(new PluginResponse().withLink(link).withLinkDetails(detail));
+		} catch (EdgescanConnectionException e) {
+			getLog().error("Unable to populate link details", e);
+			return respondException(e);
+		}
 	}
 	
 	protected FormStructure getFormStructure(final HttpServletRequest request) {

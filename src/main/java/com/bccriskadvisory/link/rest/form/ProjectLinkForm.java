@@ -38,13 +38,15 @@ import com.bccriskadvisory.jira.ao.connection.ConnectionService;
 import com.bccriskadvisory.jira.ao.projectlink.ProjectLink;
 import com.bccriskadvisory.jira.user.UnifiedUserManager;
 import com.bccriskadvisory.link.JiraPluginContext;
+import com.bccriskadvisory.link.connector.EdgescanConnectionException;
 import com.bccriskadvisory.link.connector.EdgescanV1Connector;
 import com.bccriskadvisory.link.rest.edgescan.Asset;
 import com.bccriskadvisory.link.rest.form.components.FormStructure;
 import com.bccriskadvisory.link.rest.form.components.HiddenInput;
 import com.bccriskadvisory.link.rest.form.components.Select;
+import com.bccriskadvisory.link.utility.AbstractLogSupported;
 
-public class ProjectLinkForm {
+public class ProjectLinkForm extends AbstractLogSupported {
 	
 	private static final String DEFAULT_SELECT = "-1";
 	private final ConnectionService connectionService;
@@ -80,7 +82,7 @@ public class ProjectLinkForm {
 		return this;
 	}
 	
-	public FormStructure build() {
+	public FormStructure build() throws EdgescanConnectionException {
 		checkNotNull(project, "project");
 		
 		final FormStructure form = new FormStructure("project-link-form")
@@ -98,7 +100,7 @@ public class ProjectLinkForm {
 		return form;
 	}
 	
-	private FormStructure connectionSubSection() {
+	private FormStructure connectionSubSection() throws EdgescanConnectionException {
 		final Map<String, String> connectionOptions = generateConnectionOptions();
 		
 		final FormStructure connectionSection = 
@@ -110,7 +112,7 @@ public class ProjectLinkForm {
 		return connectionSection;
 	}
 	
-	private Select assetSelect() {
+	private Select assetSelect() throws EdgescanConnectionException {
 		final Select input = new Select("Edgescan Assets", "assets").multiple().size(5);
 		final Integer connectionId = link.getConnectionId();
 		final Connection connection = connectionId != null ? connectionService.find(connectionId) : null;
@@ -214,10 +216,10 @@ public class ProjectLinkForm {
 		return ret;
 	}
 
-	private Map<String, String> generateAssetOptions(final Connection connection) {
+	private Map<String, String> generateAssetOptions(final Connection connection) throws EdgescanConnectionException {
 		final EdgescanV1Connector connector = new EdgescanV1Connector(requestFactory, connection);
 		
-		final Optional<List<Asset>> assets = connector.assets().execute().getAssets();
+		Optional<List<Asset>> assets = connector.assets().execute().getAssets();
 		
 		final Map<String, String> ret = new HashMap<>();
 		

@@ -30,6 +30,7 @@ import com.atlassian.jira.user.ApplicationUser;
 import com.bccriskadvisory.jira.ao.connection.Connection;
 import com.bccriskadvisory.jira.ao.projectlink.ProjectLink;
 import com.bccriskadvisory.link.JiraPluginContext;
+import com.bccriskadvisory.link.connector.EdgescanConnectionException;
 import com.bccriskadvisory.link.connector.EdgescanV1Connector;
 import com.bccriskadvisory.link.rest.edgescan.Asset;
 import com.bccriskadvisory.link.rest.edgescan.EdgescanResponse;
@@ -45,7 +46,7 @@ public class ProjectLinkTranslator {
 		this.pluginContext = pluginContext;
 	}
 
-	public ProjectLinkDetails detail(ProjectLink link, ApplicationUser remoteUser){
+	public ProjectLinkDetails detail(ProjectLink link, ApplicationUser remoteUser) throws EdgescanConnectionException {
 		final ProjectLinkDetails detailedLink = new ProjectLinkDetails();
 		Connection connection = pluginContext.getConnectionService().find(link.getConnectionId());
 		
@@ -81,7 +82,7 @@ public class ProjectLinkTranslator {
 		detailedLink.setUserDetails(user.getDisplayName(), avatarURL.toString());
 	}
 
-	private void populateAssets(ProjectLink link, Connection connection, final ProjectLinkDetails detailedLink) {
+	private void populateAssets(ProjectLink link, Connection connection, final ProjectLinkDetails detailedLink) throws EdgescanConnectionException {
 		Optional<List<Asset>> assets = getAssets(link, connection);
 		
 		if (assets.isPresent()) {
@@ -91,7 +92,7 @@ public class ProjectLinkTranslator {
 		}
 	}
 
-	private Optional<List<Asset>> getAssets(ProjectLink link, Connection connection) {
+	private Optional<List<Asset>> getAssets(ProjectLink link, Connection connection) throws EdgescanConnectionException {
 		EdgescanV1Connector requestFactory = new EdgescanV1Connector(pluginContext.getRequestFactory(), connection);
 		
 		EdgescanResponse edgescanResponse = requestFactory.assets().stringQuery("asset_id_in", Joiner.on(",").join(link.getAssets())).execute();

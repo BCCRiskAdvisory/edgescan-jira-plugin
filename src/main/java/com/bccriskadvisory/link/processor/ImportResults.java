@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bccriskadvisory.link.rest.PluginError;
 import com.bccriskadvisory.link.rest.edgescan.Risk;
 import com.bccriskadvisory.link.rest.gson.GsonObject;
 
@@ -34,7 +35,7 @@ public class ImportResults extends GsonObject {
 	private int totalClosed;
 	private int totalFailed;
 	
-	private List<String> errorMessages;
+	private List<PluginError> errorMessages;
 	private Map<String, ImportCount> breakdownByRisk;
 	private String importMode;
 	private boolean testMode;
@@ -51,7 +52,7 @@ public class ImportResults extends GsonObject {
 		}
 	}
 	
-	public void addError(String errorString) {
+	public void addError(PluginError errorString) {
 		errorMessages.add(errorString);
 	}
 	

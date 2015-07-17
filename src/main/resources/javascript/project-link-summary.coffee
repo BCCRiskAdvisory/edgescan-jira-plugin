@@ -5,7 +5,7 @@ do (baseUrl = "/jira/rest/eslink/1.0/links") ->
   projectkey = -> $("#project-config-details-project-key").html()
 
   AJS.toInit ->
-    if root()
+    if root().length
       get projectUrl(), {}, linkFound, linkNotFound
 
   linkFound = (response) ->
