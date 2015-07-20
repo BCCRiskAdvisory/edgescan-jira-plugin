@@ -37,7 +37,6 @@ import com.bccriskadvisory.jira.ao.projectlink.ProjectLinkServiceImpl;
 import com.bccriskadvisory.jira.ao.projectlink.ProjectLinkValidator;
 import com.bccriskadvisory.jira.ao.validation.ValidationResult;
 import com.bccriskadvisory.link.JiraPluginContext;
-import com.bccriskadvisory.link.connector.EdgescanConnectionException;
 import com.bccriskadvisory.link.processor.ImportResults;
 import com.bccriskadvisory.link.processor.ProjectLinkImportProcessor;
 import com.bccriskadvisory.link.rest.PluginResponse;
@@ -90,15 +89,9 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 		if (notAuthed(request)) return noAuthResponse(request);
 		
 		final ProjectLink link = getLinkByProjectKey(key).orElse(new ProjectLink(key));
-		FormStructure form;
-		try {
-			form = new ProjectLinkForm(pluginContext).withLink(link).build();
-			
-			return respond(new PluginResponse().withLink(link).withFormStructure(form));
-		} catch (EdgescanConnectionException e) {
-			getLog().error("Unable to build form for link for project " + key);
-			return respondException(e);
-		}
+		FormStructure form = new ProjectLinkForm(pluginContext).withLink(link).build();
+		
+		return respond(new PluginResponse().withLink(link).withFormStructure(form));
 	}
 	
 	@POST
@@ -195,15 +188,9 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 		final Optional<ProjectLink> linkFromBody = getLinkFromBody(body);
 		
 		if (linkFromBody.isPresent()) {
-			FormStructure form;
-			try {
-				form = new ProjectLinkForm(pluginContext).withLink(linkFromBody.get()).build();
-				
-				return respond(new PluginResponse().withFormStructure(form));
-			} catch (EdgescanConnectionException e) {
-				getLog().error("Unable to build form for link for project " + linkFromBody.get().getProjectKey());
-				return respondException(e);
-			}
+			FormStructure form = new ProjectLinkForm(pluginContext).withLink(linkFromBody.get()).build();
+			
+			return respond(new PluginResponse().withFormStructure(form));
 		} else {
 			return respondError("Invalid Input", "An invalid project link was provided.");
 		}
@@ -228,14 +215,8 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 	private Response linkWithDetails(final HttpServletRequest request, final ProjectLink link) {
 		final Optional<ApplicationUser> user = pluginContext.getUserManager().getUser(request);
 		
-		ProjectLinkDetails detail;
-		try {
-			detail = new ProjectLinkTranslator(pluginContext).detail(link, user.get());
-			return respond(new PluginResponse().withLink(link).withLinkDetails(detail));
-		} catch (EdgescanConnectionException e) {
-			getLog().error("Unable to populate link details", e);
-			return respondException(e);
-		}
+		ProjectLinkDetails detail = new ProjectLinkTranslator(pluginContext).detail(link, user.get());
+		return respond(new PluginResponse().withLink(link).withLinkDetails(detail));
 	}
 	
 	protected FormStructure getFormStructure(final HttpServletRequest request) {

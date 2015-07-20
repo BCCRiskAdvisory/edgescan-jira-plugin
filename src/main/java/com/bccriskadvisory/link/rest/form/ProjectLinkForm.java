@@ -82,7 +82,7 @@ public class ProjectLinkForm extends AbstractLogSupported {
 		return this;
 	}
 	
-	public FormStructure build() throws EdgescanConnectionException {
+	public FormStructure build() {
 		checkNotNull(project, "project");
 		
 		final FormStructure form = new FormStructure("project-link-form")
@@ -100,7 +100,7 @@ public class ProjectLinkForm extends AbstractLogSupported {
 		return form;
 	}
 	
-	private FormStructure connectionSubSection() throws EdgescanConnectionException {
+	private FormStructure connectionSubSection() {
 		final Map<String, String> connectionOptions = generateConnectionOptions();
 		
 		final FormStructure connectionSection = 
@@ -112,13 +112,19 @@ public class ProjectLinkForm extends AbstractLogSupported {
 		return connectionSection;
 	}
 	
-	private Select assetSelect() throws EdgescanConnectionException {
+	private Select assetSelect() {
 		final Select input = new Select("Edgescan Assets", "assets").multiple().size(5);
 		final Integer connectionId = link.getConnectionId();
 		final Connection connection = connectionId != null ? connectionService.find(connectionId) : null;
 		
 		if(connection != null) {
-			input.withOptions(generateAssetOptions(connection));
+			try {
+				input.withOptions(generateAssetOptions(connection));
+			} catch (EdgescanConnectionException e) {
+				getLog().error("Unable to get assets when building form for link for project " + link.getProjectKey());
+				input.withOption("", "Edgescan Connection failed!")
+					.disable();
+			}
 		} else {
 			input.withOption("", "Select connection...")
 				.disable();

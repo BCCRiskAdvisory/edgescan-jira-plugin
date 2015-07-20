@@ -3,7 +3,7 @@
     <tbody>
         <tr>
             <td>Connection</td>
-            <td>{connectionName}</td>
+            <td><a href="/jira/secure/ConfigureEdgescanConnection.jspa">{connectionName}</a></td>
         </tr>
         <tr>
             <td>Linked Edgescan Assets</td>

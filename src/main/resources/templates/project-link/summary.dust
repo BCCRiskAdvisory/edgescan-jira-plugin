@@ -9,7 +9,7 @@
                     <span class="project-config-list-value"><a href="/jira/secure/ConfigureEdgescanProjectLink.jspa">{link.projectKey}: configure Edgescan link</a></span>
                 </li>
                 <li>
-                    <span class="project-config-list-label">Status:</span>
+                    <span class="project-config-list-label">Automatic Imports:</span>
                     <span class="project-config-list-value">{>"project-link/status"/}</span>
                 </li>
                 <li>

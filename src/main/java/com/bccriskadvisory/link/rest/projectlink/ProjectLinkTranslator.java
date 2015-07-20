@@ -34,9 +34,10 @@ import com.bccriskadvisory.link.connector.EdgescanConnectionException;
 import com.bccriskadvisory.link.connector.EdgescanV1Connector;
 import com.bccriskadvisory.link.rest.edgescan.Asset;
 import com.bccriskadvisory.link.rest.edgescan.EdgescanResponse;
+import com.bccriskadvisory.link.utility.AbstractLogSupported;
 import com.google.common.base.Joiner;
 
-public class ProjectLinkTranslator {
+public class ProjectLinkTranslator extends AbstractLogSupported {
 	
 	private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.RFC_1123_DATE_TIME;
 	
@@ -46,7 +47,7 @@ public class ProjectLinkTranslator {
 		this.pluginContext = pluginContext;
 	}
 
-	public ProjectLinkDetails detail(ProjectLink link, ApplicationUser remoteUser) throws EdgescanConnectionException {
+	public ProjectLinkDetails detail(ProjectLink link, ApplicationUser remoteUser) {
 		final ProjectLinkDetails detailedLink = new ProjectLinkDetails();
 		Connection connection = pluginContext.getConnectionService().find(link.getConnectionId());
 		
@@ -82,8 +83,15 @@ public class ProjectLinkTranslator {
 		detailedLink.setUserDetails(user.getDisplayName(), avatarURL.toString());
 	}
 
-	private void populateAssets(ProjectLink link, Connection connection, final ProjectLinkDetails detailedLink) throws EdgescanConnectionException {
-		Optional<List<Asset>> assets = getAssets(link, connection);
+	private void populateAssets(ProjectLink link, Connection connection, final ProjectLinkDetails detailedLink) {
+		Optional<List<Asset>> assets;
+		try {
+			assets = getAssets(link, connection);
+		} catch (EdgescanConnectionException e) {
+			getLog().error("Could not retrieve edgescan assets, check configured connection");
+			detailedLink.addAsset(0, "Edgescan Connection Failed!");
+			return;
+		}
 		
 		if (assets.isPresent()) {
 			for (Asset asset : assets.get()) {

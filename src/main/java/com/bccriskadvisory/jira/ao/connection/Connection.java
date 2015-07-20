@@ -27,7 +27,6 @@ public class Connection extends GsonObject implements PluginObject<ConnectionEnt
 	private String url;
 	private String pollingInterval;
 	private String apiKey;
-	private boolean isEnabled;
 	
 	public Connection() { }
 	
@@ -38,7 +37,6 @@ public class Connection extends GsonObject implements PluginObject<ConnectionEnt
 		url = entity.getUrl();
 		pollingInterval = entity.getPollingInterval();
 		apiKey = entity.getApiKey();
-		isEnabled = entity.isEnabled();
 	}
 	
 	@Override
@@ -48,7 +46,6 @@ public class Connection extends GsonObject implements PluginObject<ConnectionEnt
 		other.setUrl(getUrl());
 		other.setApiKey(getApiKey());
 		other.setPollingInterval(getPollingInterval());
-		other.setEnabled(isEnabled());
 	}
 
 	@Override
@@ -98,13 +95,5 @@ public class Connection extends GsonObject implements PluginObject<ConnectionEnt
 	
 	public String getApiKey() {
 		return apiKey;
-	}
-	
-	public boolean isEnabled() {
-		return isEnabled;
-	}
-	
-	public void setEnabled(boolean isEnabled) {
-		this.isEnabled = isEnabled;
 	}
 }

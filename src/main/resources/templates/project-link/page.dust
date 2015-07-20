@@ -5,7 +5,7 @@
     </div>
     <div class="aui-item">
         <div id="link-status">
-            <p> Link is currently {~s} {>"project-link/status"/} </p>
+            <p> Automatic Imports are {~s} {>"project-link/status"/} </p>
             
             <br>
 

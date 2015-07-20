@@ -4,13 +4,6 @@
 	<td>{url}</td>
 	<td>{apiKey}</td>
 	<td>
-		{@eq key=isEnabled value="true" type="boolean"}
-			<span data_id="{ID}" class="aui-lozenge aui-lozenge-success enabled"> Enabled </span>
-		{:else}
-			<span data_id="{ID}" class="aui-lozenge aui-lozenge-error enabled"> Disabled </span>
-		{/eq}
-	</td>
-	<td>
 		<button data_id="{ID}" class="aui-button test">Test</button>
 		<button data_id="{ID}" class="aui-button edit">Edit</button>
 		<button data_id="{ID}" class="aui-button delete">Delete</button>
