@@ -35,12 +35,14 @@ public class ImportResults extends GsonObject {
 	private int totalClosed;
 	private int totalFailed;
 	
+	private int deleted;
+	
 	private List<PluginError> errorMessages;
 	private Map<String, ImportCount> breakdownByRisk;
-	private String importMode;
+	private ImportMode importMode;
 	private boolean testMode;
 	
-	public ImportResults(String importMode, boolean testMode) {
+	public ImportResults(ImportMode importMode, boolean testMode) {
 		this.importMode = importMode;
 		this.testMode = testMode;
 		
@@ -58,6 +60,10 @@ public class ImportResults extends GsonObject {
 	
 	public ImportCount forRisk(Risk risk) {
 		return breakdownByRisk.get(risk.getKeyString());
+	}
+	
+	public void deleted() {
+		deleted++;
 	}
 	
 	public class ImportCount {

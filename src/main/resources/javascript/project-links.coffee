@@ -13,8 +13,8 @@ do (baseUrl = "/jira/rest/eslink/1.0/links") ->
         put "#{projectUrl()}/toggle", {}, renderLink
       $("#import-updated").click () ->
         manualImport "updated"
-      $("#import-all").click () ->
-        manualImport "all"
+      $("#import-full").click () ->
+        manualImport "full"
 
   editLink = () ->
     get "#{projectUrl()}/edit", {}, renderForm 

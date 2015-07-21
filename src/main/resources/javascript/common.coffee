@@ -40,7 +40,7 @@ ajax_call = (method) ->
     }
 
 get = ajax_call "GET"
-destroy = ajax_call "DELETE"
+destroy = (url, onComplete, onError) -> ajax_call("DELETE")(url, {}, onComplete, onError)
 post = ajax_call "POST"
 put = ajax_call "PUT"
 

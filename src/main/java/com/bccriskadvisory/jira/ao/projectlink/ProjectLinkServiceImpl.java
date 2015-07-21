@@ -15,11 +15,17 @@
  */
 package com.bccriskadvisory.jira.ao.projectlink;
 
+import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
+
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.bccriskadvisory.jira.ao.ActiveObjectsServiceImpl;
+import com.google.common.collect.Maps;
 
 public class ProjectLinkServiceImpl extends ActiveObjectsServiceImpl<ProjectLinkEntity, ProjectLink> implements ProjectLinkService {
 
+	private Map<Integer, ReentrantLock> importLocks = Maps.newHashMap();
+	
 	public ProjectLinkServiceImpl(final ActiveObjects activeObjects) {
 		super(ProjectLinkEntity.class, activeObjects);
 	}
@@ -27,5 +33,17 @@ public class ProjectLinkServiceImpl extends ActiveObjectsServiceImpl<ProjectLink
 	@Override
 	protected ProjectLink constructFromEntity(ProjectLinkEntity entity) {
 		return new ProjectLink(entity);
+	}
+	
+	@Override
+	public synchronized ReentrantLock getImportLock(ProjectLink link) {
+		ReentrantLock importLock = importLocks.get(link.getID());
+		
+		if (importLock == null) {
+			importLock = new ReentrantLock();
+			importLocks.put(link.getID(), importLock);
+		}
+		
+		return importLock;
 	}
 }

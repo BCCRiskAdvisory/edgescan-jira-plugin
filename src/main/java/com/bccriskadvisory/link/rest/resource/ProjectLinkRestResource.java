@@ -17,6 +17,7 @@ package com.bccriskadvisory.link.rest.resource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,13 +33,17 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.atlassian.jira.user.ApplicationUser;
+import com.bccriskadvisory.jira.ao.connection.Connection;
 import com.bccriskadvisory.jira.ao.projectlink.ProjectLink;
-import com.bccriskadvisory.jira.ao.projectlink.ProjectLinkServiceImpl;
+import com.bccriskadvisory.jira.ao.projectlink.ProjectLinkService;
 import com.bccriskadvisory.jira.ao.projectlink.ProjectLinkValidator;
 import com.bccriskadvisory.jira.ao.validation.ValidationResult;
 import com.bccriskadvisory.link.JiraPluginContext;
+import com.bccriskadvisory.link.connector.EdgescanV1Connector;
+import com.bccriskadvisory.link.processor.ImportMode;
 import com.bccriskadvisory.link.processor.ImportResults;
-import com.bccriskadvisory.link.processor.ProjectLinkImportProcessor;
+import com.bccriskadvisory.link.processor.ProjectImportProcessor;
+import com.bccriskadvisory.link.processor.VulnerabilityDetailGenerator;
 import com.bccriskadvisory.link.rest.PluginResponse;
 import com.bccriskadvisory.link.rest.form.ProjectLinkForm;
 import com.bccriskadvisory.link.rest.form.components.FormStructure;
@@ -52,7 +57,7 @@ import com.google.gson.JsonSyntaxException;
 public class ProjectLinkRestResource extends AbstractRestResource {
 	
 	private final JiraPluginContext pluginContext;
-	private final ProjectLinkServiceImpl projectLinkService;
+	private final ProjectLinkService projectLinkService;
 
 	public ProjectLinkRestResource(final JiraPluginContext context) {
 		super(checkNotNull(context, "Plugin Context"));
@@ -160,21 +165,17 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 	@Path("{id}/import")
 	public Response manualImport(@PathParam("id") final String id, @Context final HttpServletRequest request) {
 		if (notAuthed(request)) return noAuthResponse(request);
-		String testMode = request.getParameter("testMode");
-		String importMode = request.getParameter("mode");
+		boolean testMode = Boolean.parseBoolean(request.getParameter("testMode"));
+		ImportMode importMode = ImportMode.fromString(request.getParameter("mode"));
 		
 		final Optional<ProjectLink> projectLink = getLinkByProjectKey(id);
 		
 		if (projectLink.isPresent()) {
-			if (ProjectLinkImportProcessor.UPDATE_MODE.equals(importMode) || ProjectLinkImportProcessor.ALL_MODE.equals(importMode)) {
-				final ProjectLinkImportProcessor processor = new ProjectLinkImportProcessor(pluginContext, importMode, Boolean.parseBoolean(testMode));
-				processor.initWithLink(projectLink.get());
-				final ImportResults importResults = processor.processImport();
-				
-				return respond(new PluginResponse().withImportResults(importResults));
-			} else {
-				return respondError("Invalid Input", "Unrecognized import mode.");
-			}
+			final ProjectImportProcessor processor = importMode.createProcessor(pluginContext, testMode);
+			processor.initWithLink(projectLink.get());
+			final ImportResults importResults = processor.processImport();
+			
+			return respond(new PluginResponse().withImportResults(importResults));
 		} else {
 			return respondNotFound();
 		}
@@ -194,6 +195,25 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 		} else {
 			return respondError("Invalid Input", "An invalid project link was provided.");
 		}
+	}
+	
+	@GET
+	@Path("{id}/test/{vid}")
+	public Response testParse(@PathParam("id") final String id, @PathParam("vid") final String vid, @Context final HttpServletRequest request) {
+		if (notAuthed(request)) return noAuthResponse(request);
+
+		Optional<ProjectLink> link = getLinkByProjectKey(id);
+		if (link.isPresent()) {
+			Connection connection = pluginContext.getConnectionService().find(link.get().getConnectionId());
+			EdgescanV1Connector connector = new EdgescanV1Connector(pluginContext.getRequestFactory(), connection);
+			
+			VulnerabilityDetailGenerator detailGenerator = new VulnerabilityDetailGenerator(connector);
+			String details = detailGenerator.getDetails(Integer.parseInt(vid));
+			
+			return respond(new PluginResponse().withObject(Collections.singletonMap("jiramarkup", details)));
+		}
+		
+		return respondNotFound();
 	}
 	
 	private Optional<ProjectLink> getLinkFromBody(final String body) {

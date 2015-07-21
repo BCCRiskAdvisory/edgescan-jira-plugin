@@ -98,12 +98,22 @@ public class ConfluenceWikiMarkupSerializer implements Visitor {
 		visitChildren(node);
 		printer.print("{quote}").println();
 	}
+	
+
+	@Override
+	public void visit(VerbatimNode node) {
+		printCode(node);
+	}
 
 	@Override
 	public void visit(CodeNode node) {
-		printer.print("{code}").println();
+		printCode(node);
+	}
+
+	private void printCode(TextNode node) {
+		printer.print("{noformat}").println();
 		printer.print(node.getText());
-		printer.print("{code}").println();
+		printer.print("{noformat}").println();
 	}
 
 	@Override
@@ -224,6 +234,36 @@ public class ConfluenceWikiMarkupSerializer implements Visitor {
 		}
 	}
 	
+	@Override
+	public void visit(SimpleNode node) {
+
+        switch (node.getType()) {
+            case Apostrophe:
+                printer.print("'");
+                break;
+            case Ellipsis:
+                printer.print("...");
+                break;
+            case Emdash:
+                printer.print("---");
+                break;
+            case Endash:
+                printer.print("--");
+                break;
+            case HRule:
+                printer.println().print("\\\\");
+                break;
+            case Linebreak:
+                printer.print("\\\\");
+                break;
+            case Nbsp:
+                printer.print(" ");
+                break;
+            default:
+                throw new IllegalStateException();
+        }
+	}
+	
 	private void logError(Node node, String... text) {
 		errors.add(String.format("Unsupported node type: %s with contents %s", node.getClass(), Joiner.on(",").join(text)));
 	}
@@ -287,35 +327,6 @@ public class ConfluenceWikiMarkupSerializer implements Visitor {
 	public void visit(RefLinkNode node) {
 		logError(node);
 	}
-	@Override
-	public void visit(SimpleNode node) {
-
-        switch (node.getType()) {
-            case Apostrophe:
-                printer.print("'");
-                break;
-            case Ellipsis:
-                printer.print("...");
-                break;
-            case Emdash:
-                printer.print("---");
-                break;
-            case Endash:
-                printer.print("--");
-                break;
-            case HRule:
-                printer.println().print("\\\\");
-                break;
-            case Linebreak:
-                printer.print("\\\\");
-                break;
-            case Nbsp:
-                printer.print(" ");
-                break;
-            default:
-                throw new IllegalStateException();
-        }
-	}
 
 	@Override
 	public void visit(TableBodyNode node) {
@@ -349,11 +360,6 @@ public class ConfluenceWikiMarkupSerializer implements Visitor {
 
 	@Override
 	public void visit(TableRowNode node) {
-		logError(node);
-	}
-
-	@Override
-	public void visit(VerbatimNode node) {
 		logError(node);
 	}
 

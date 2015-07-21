@@ -12,6 +12,7 @@ Finished {@eq key=testMode value="true" type="boolean"}testing{/eq} import of {i
                 <li>Updated:{totalUpdated}</li>
                 <li>Closed:{totalClosed}</li>
                 <li>Failed:{totalFailed}</li>
+                <li>Deleted:{deleted}</li>
             </ul></td>
         </tr>
         {#breakdownByRisk}

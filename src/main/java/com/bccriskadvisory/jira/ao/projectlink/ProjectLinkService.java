@@ -15,8 +15,12 @@
  */
 package com.bccriskadvisory.jira.ao.projectlink;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import com.bccriskadvisory.jira.ao.ActiveObjectsService;
 
 public interface ProjectLinkService extends ActiveObjectsService<ProjectLink>{
+
+	ReentrantLock getImportLock(ProjectLink link);
 
 }

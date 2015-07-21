@@ -29,6 +29,7 @@ import com.atlassian.sal.api.net.RequestFactory;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.bccriskadvisory.jira.ao.connection.ConnectionService;
 import com.bccriskadvisory.jira.ao.connection.ConnectionServiceImpl;
+import com.bccriskadvisory.jira.ao.projectlink.ProjectLinkService;
 import com.bccriskadvisory.jira.ao.projectlink.ProjectLinkServiceImpl;
 import com.bccriskadvisory.jira.ao.vulnerabilitylink.VulnerabilityLinkService;
 import com.bccriskadvisory.jira.ao.vulnerabilitylink.VulnerabilityLinkServiceImpl;
@@ -48,7 +49,7 @@ public class JiraPluginContext {
 	private final IssueWorkflowManager issueWorkflowManager;
 	
 	private final VulnerabilityLinkService vulnerabilityLinkService;
-	private final ProjectLinkServiceImpl projectLinkService;
+	private final ProjectLinkService projectLinkService;
 	private final ConnectionService connectionService;
 	private final AvatarService avatarService;
 	
@@ -114,7 +115,7 @@ public class JiraPluginContext {
 		return issueWorkflowManager;
 	}
 
-	public ProjectLinkServiceImpl getProjectLinkService() {
+	public ProjectLinkService getProjectLinkService() {
 		return projectLinkService;
 	}
 

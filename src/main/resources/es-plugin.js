@@ -69,7 +69,9 @@
 
   get = ajax_call("GET");
 
-  destroy = ajax_call("DELETE");
+  destroy = function(url, onComplete, onError) {
+    return ajax_call("DELETE")(url, {}, onComplete, onError);
+  };
 
   post = ajax_call("POST");
 
@@ -151,21 +153,17 @@
     };
     createListener = function(e) {
       e.preventDefault();
-      return post(baseUrl, buildParams(paramNames), function(response) {
+      return post(baseUrl, buildParams(paramNames), responseHandler(function(response) {
         var connection;
-        if (response.errorMessages) {
-          return renderErrors(response.errorMessages);
-        } else {
-          connection = response.connection;
-          return dust.render('connection/connection-row', connection, function(err, html) {
-            $("#connection-table tbody").append(html);
-            elementById(".edit", connection.ID).click(editListener);
-            elementById(".delete", connection.ID).click(deleteListener);
-            elementById(".test", connection.ID).click(testListener);
-            return populateForm();
-          });
-        }
-      });
+        connection = response.connection;
+        return dust.render('connection/connection-row', connection, function(err, html) {
+          $("#connection-table tbody").append(html);
+          elementById(".edit", connection.ID).click(editListener);
+          elementById(".delete", connection.ID).click(deleteListener);
+          elementById(".test", connection.ID).click(testListener);
+          return populateForm();
+        });
+      }));
     };
     updateListener = function(e) {
       var id;
@@ -280,8 +278,8 @@
         $("#import-updated").click(function() {
           return manualImport("updated");
         });
-        return $("#import-all").click(function() {
-          return manualImport("all");
+        return $("#import-full").click(function() {
+          return manualImport("full");
         });
       });
     };

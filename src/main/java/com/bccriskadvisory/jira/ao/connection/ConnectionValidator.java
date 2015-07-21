@@ -31,8 +31,6 @@ public class ConnectionValidator {
 	}
 	
 	public void normalize(Connection connection) {
-		connection.setEnabled(true);
-		
 		if (isNullOrEmpty(connection.getPollingInterval())) {
 			connection.setPollingInterval("60");
 		}

@@ -16,7 +16,7 @@
 
         <h2>Manual Import</h2>
         <button id="import-updated" class="aui-button">Import Updated</button>
-        <button id="import-all" class="aui-button">Import All</button>
+        <button id="import-full" class="aui-button">Full Import</button>
         <div class="import-spinner"/>
         {>"form/checkbox-input" name="test-mode" label="Test Mode"/}
         <div class="result-container">

@@ -103,7 +103,7 @@ public class ProjectLinkTranslator extends AbstractLogSupported {
 	private Optional<List<Asset>> getAssets(ProjectLink link, Connection connection) throws EdgescanConnectionException {
 		EdgescanV1Connector requestFactory = new EdgescanV1Connector(pluginContext.getRequestFactory(), connection);
 		
-		EdgescanResponse edgescanResponse = requestFactory.assets().stringQuery("asset_id_in", Joiner.on(",").join(link.getAssets())).execute();
+		EdgescanResponse edgescanResponse = requestFactory.assets().stringQuery("id_in", Joiner.on(",").join(link.getAssets())).execute();
 		
 		return edgescanResponse.getAssets();
 	}

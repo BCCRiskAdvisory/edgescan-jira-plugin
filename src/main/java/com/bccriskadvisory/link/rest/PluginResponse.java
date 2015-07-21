@@ -27,8 +27,11 @@ import com.bccriskadvisory.link.rest.gson.GsonObject;
 import com.bccriskadvisory.link.rest.projectlink.ProjectLinkDetails;
 import com.google.common.collect.Lists;
 
+/**
+ * An object representing the possible responses of the plugin rest resources. This object is not used internally by the plugin, only serialized to JSON.
+ */
 @SuppressWarnings("unused")
-public class PluginResponse extends GsonObject {
+public class PluginResponse extends GsonObject { 
 	
 	private FormStructure form;
 	
@@ -42,6 +45,11 @@ public class PluginResponse extends GsonObject {
 	private ImportResults importResults;
 	
 	private List<PluginError> errorMessages = Lists.newArrayList();
+	
+	/**
+	 * TEST PURPOSES ONLY - this is equivalent to an arbitrary json object.
+	 */
+	private Map<String, String> object;
 	
 	public PluginResponse withFormStructure(FormStructure form) {
 		this.form = form;
@@ -90,6 +98,14 @@ public class PluginResponse extends GsonObject {
 	
 	public PluginResponse withException(Exception exception) {
 		this.errorMessages.add(new PluginError(exception));
+		return this;
+	}
+	
+	/**
+	 * TEST PURPOSES ONLY - The map may represent an arbitrary json object
+	 */
+	public PluginResponse withObject(Map<String, String> object) {
+		this.object = object;
 		return this;
 	}
 }

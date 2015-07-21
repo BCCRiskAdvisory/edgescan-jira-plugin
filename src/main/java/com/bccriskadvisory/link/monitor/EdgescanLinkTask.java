@@ -28,9 +28,9 @@ import com.atlassian.sal.api.scheduling.PluginJob;
 import com.bccriskadvisory.jira.ao.connection.Connection;
 import com.bccriskadvisory.jira.ao.connection.ConnectionService;
 import com.bccriskadvisory.jira.ao.projectlink.ProjectLink;
-import com.bccriskadvisory.jira.ao.projectlink.ProjectLinkServiceImpl;
+import com.bccriskadvisory.jira.ao.projectlink.ProjectLinkService;
 import com.bccriskadvisory.link.JiraPluginContext;
-import com.bccriskadvisory.link.processor.ProjectLinkImportProcessor;
+import com.bccriskadvisory.link.processor.AutoProjectImportProcessor;
 import com.bccriskadvisory.link.utility.Utilities;
 
 public class EdgescanLinkTask implements PluginJob {
@@ -43,7 +43,7 @@ public class EdgescanLinkTask implements PluginJob {
 		
 		pluginContext = monitor.getPluginContext();
 		
-		final ProjectLinkServiceImpl projectLinkService = pluginContext.getProjectLinkService();
+		final ProjectLinkService projectLinkService = pluginContext.getProjectLinkService();
 		final ConnectionService connectionService = pluginContext.getConnectionService();
 		
 		for (final ProjectLink link : projectLinkService.index()) {
@@ -52,7 +52,7 @@ public class EdgescanLinkTask implements PluginJob {
 				final Connection connection = connectionService.find(link.getConnectionId());
 				
 				if (updateDue(link, connection)) {
-					new ProjectLinkImportProcessor(pluginContext, ProjectLinkImportProcessor.UPDATE_MODE, false).initWithLink(link).processImport();
+					new AutoProjectImportProcessor(pluginContext, false).initWithLink(link).processImport();
 				}
 			}
 		}

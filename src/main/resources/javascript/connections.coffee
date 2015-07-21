@@ -23,19 +23,16 @@ do (baseUrl = "/jira/rest/eslink/1.0/connections", paramNames = ['ID', 'name', '
   createListener = (e) ->
     e.preventDefault()
     
-    post baseUrl, buildParams(paramNames), (response) ->
-      if response.errorMessages
-        renderErrors response.errorMessages
-      else 
-        connection = response.connection
-        dust.render 'connection/connection-row', connection, (err, html) ->
-            $("#connection-table tbody").append(html)
+    post baseUrl, buildParams(paramNames), responseHandler (response) ->
+      connection = response.connection
+      dust.render 'connection/connection-row', connection, (err, html) ->
+          $("#connection-table tbody").append(html)
 
-            elementById(".edit", connection.ID).click editListener
-            elementById(".delete", connection.ID).click deleteListener
-            elementById(".test", connection.ID).click testListener
+          elementById(".edit", connection.ID).click editListener
+          elementById(".delete", connection.ID).click deleteListener
+          elementById(".test", connection.ID).click testListener
 
-            populateForm()
+          populateForm()
 
   updateListener = (e) ->
     e.preventDefault()
