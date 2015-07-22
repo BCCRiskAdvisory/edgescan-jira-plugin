@@ -19,19 +19,19 @@ import com.bccriskadvisory.link.JiraPluginContext;
 
 public enum ImportMode {
 	
-	AUTO(true) {
+	AUTO(true, "automatic import") {
 		@Override
 		public ProjectImportProcessor createProcessor( JiraPluginContext pluginContext, boolean testMode) {
 			return new AutoProjectImportProcessor(pluginContext, testMode);
 		}
 	}, 
-	UPDATE(true) {
+	UPDATE(true, "updated vulnerability import") {
 		@Override
 		public ProjectImportProcessor createProcessor( JiraPluginContext pluginContext, boolean testMode) {
 			return new UpdateProjectImportProcessor(pluginContext, testMode);
 		}
 	}, 
-	FULL(false) {
+	FULL(false, "full vulnerability import") {
 		@Override
 		public ProjectImportProcessor createProcessor( JiraPluginContext pluginContext, boolean testMode) {
 			return new FullProjectImportProcessor(pluginContext, testMode);
@@ -39,15 +39,21 @@ public enum ImportMode {
 	};
 	
 	private boolean isUpdate;
+	private String display;
 	
-	private ImportMode(boolean isUpdate) {
+	private ImportMode(boolean isUpdate, String display) {
 		this.isUpdate = isUpdate;
+		this.display = display;
 	}
 	
 	public abstract ProjectImportProcessor createProcessor(JiraPluginContext pluginContext, boolean testMode);
 
 	public boolean isUpdate() {
 		return isUpdate;
+	}
+	
+	public String getDisplay() {
+		return display;
 	}
 	
 	public static ImportMode fromString(String in) {

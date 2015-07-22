@@ -1,4 +1,4 @@
-Finished {@eq key=testMode value="true" type="boolean"}testing{/eq} import of {importMode} vulnerabilities.
+Finished {@eq key=testMode value="true" type="boolean"}testing{/eq} {importMode}.
 <table class="aui">
     <thead></thead>
     <tbody>

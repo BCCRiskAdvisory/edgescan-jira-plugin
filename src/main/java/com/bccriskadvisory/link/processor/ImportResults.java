@@ -39,11 +39,11 @@ public class ImportResults extends GsonObject {
 	
 	private List<PluginError> errorMessages;
 	private Map<String, ImportCount> breakdownByRisk;
-	private ImportMode importMode;
+	private String importMode;
 	private boolean testMode;
 	
 	public ImportResults(ImportMode importMode, boolean testMode) {
-		this.importMode = importMode;
+		this.importMode = importMode.getDisplay();
 		this.testMode = testMode;
 		
 		breakdownByRisk = new HashMap<>();
