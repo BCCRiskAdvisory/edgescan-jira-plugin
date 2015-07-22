@@ -177,10 +177,10 @@
 					<excludes>
 						<exclude>**/README</exclude>
 						<exclude>src/test/resources/**</exclude>
-						<exclude>/src/main/resources/.sass-cache/**</exclude>
-						<exclude>/edgescan-jira-plugin/src/main/resources/dust-core.min.js</exclude>
-						<exclude>/edgescan-jira-plugin/src/main/resources/dust-helpers.min.js</exclude>
-						<exclude>/edgescan-jira-plugin/LICENSE.txt</exclude>
+						<exclude>src/main/resources/.sass-cache/**</exclude>
+						<exclude>src/main/resources/dust-core.min.js</exclude>
+						<exclude>src/main/resources/dust-helpers.min.js</exclude>
+						<exclude>LICENSE.txt</exclude>
 					</excludes>
 				</configuration>
 				<executions>

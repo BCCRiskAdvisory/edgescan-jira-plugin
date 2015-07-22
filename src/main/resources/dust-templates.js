@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2015 BCC Risk Advisory (info@bccriskadvisory.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 (function(dust){dust.register("common\/dialog",body_0);function body_0(chk,ctx){return chk.w("<section role=\"dialog\" id=\"").f(ctx.get(["id"], false),ctx,"h").w("\" class=\"aui-layer aui-dialog2 aui-dialog2-medium\" aria-hidden=\"true\" data-aui-remove-on-hide=\"true\"><header class=\"aui-dialog2-header\"><h2 class=\"aui-dialog2-header-main\">").f(ctx.get(["title"], false),ctx,"h").w("</h2><a class=\"aui-dialog2-header-close\"><span class=\"aui-icon aui-icon-small aui-iconfont-close-dialog\">Close</span></a></header><div class=\"aui-dialog2-content\">").x(ctx.getPath(false, ["body","type"]),ctx,{"else":body_1,"block":body_2},{}).w("</div><footer class=\"aui-dialog2-footer\"><div class=\"aui-dialog2-footer-actions\"><button id=\"dialog-close-button\" class=\"aui-button aui-button-link\">Close</button></div></footer></section>");}body_0.__dustBody=!0;function body_1(chk,ctx){return chk.f(ctx.get(["body"], false),ctx,"h");}body_1.__dustBody=!0;function body_2(chk,ctx){return chk.p(body_3,ctx,ctx.rebase(ctx.get(["body"], false)),{});}body_2.__dustBody=!0;function body_3(chk,ctx){return chk.f(ctx.getPath(false, ["body","type"]),ctx,"h");}body_3.__dustBody=!0;return body_0}(dust));
 (function(dust){dust.register("connection\/connection-row",body_0);function body_0(chk,ctx){return chk.w("<tr data_id=\"").f(ctx.get(["ID"], false),ctx,"h").w("\"><td>").f(ctx.get(["name"], false),ctx,"h").w("</td><td>").f(ctx.get(["description"], false),ctx,"h").w("</td><td>").f(ctx.get(["url"], false),ctx,"h").w("</td><td>").f(ctx.get(["apiKey"], false),ctx,"h").w("</td><td><button data_id=\"").f(ctx.get(["ID"], false),ctx,"h").w("\" class=\"aui-button test\">Test</button><button data_id=\"").f(ctx.get(["ID"], false),ctx,"h").w("\" class=\"aui-button edit\">Edit</button><button data_id=\"").f(ctx.get(["ID"], false),ctx,"h").w("\" class=\"aui-button delete\">Delete</button></td></tr>");}body_0.__dustBody=!0;return body_0}(dust));
 (function(dust){dust.register("form\/checkbox-input",body_0);function body_0(chk,ctx){return chk.w("<div class=\"field-group\"><label for=\"").f(ctx.get(["name"], false),ctx,"h").w("\">").f(ctx.get(["label"], false),ctx,"h").w(":</label><input type=\"checkbox\" id=\"").f(ctx.get(["name"], false),ctx,"h").w("\" name=\"").f(ctx.get(["name"], false),ctx,"h").w("\" class=\"checkbox\" ").h("eq",ctx,{"block":body_1},{"key":ctx.get(["value"], false),"value":"true","type":"boolean"},"h").w("></div>");}body_0.__dustBody=!0;function body_1(chk,ctx){return chk.w(" checked ");}body_1.__dustBody=!0;return body_0}(dust));
