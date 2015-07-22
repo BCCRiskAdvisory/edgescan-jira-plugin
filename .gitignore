@@ -8,6 +8,7 @@ target/
 
 #general
 *.log
+.~lock.*
 
 #sass
 src/main/resources/.sass-cache/
