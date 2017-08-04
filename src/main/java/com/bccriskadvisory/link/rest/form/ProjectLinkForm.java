@@ -20,7 +20,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.project.ProjectService;
@@ -225,12 +224,12 @@ public class ProjectLinkForm extends AbstractLogSupported {
 	private Map<String, String> generateAssetOptions(final Connection connection) throws EdgescanConnectionException {
 		final EdgescanV1Connector connector = new EdgescanV1Connector(requestFactory, connection);
 		
-		Optional<List<Asset>> assets = connector.assets().execute().getAssets();
+		List<Asset> assets = connector.assets().execute().getAssets();
 		
 		final Map<String, String> ret = new HashMap<>();
 		
-		if (assets.isPresent()) {
-			for (final Asset asset : assets.get()) {
+		if (!assets.isEmpty()) {
+			for (final Asset asset : assets) {
 				ret.put(Integer.toString(asset.getId()), asset.getName());
 			}
 		}

@@ -1,4 +1,4 @@
-do (baseUrl = "/jira/rest/eslink/1.0/links") ->
+do (baseUrl = "/rest/eslink/1.0/links") ->
   AJS.toInit ->
     initPage() if root().length
 

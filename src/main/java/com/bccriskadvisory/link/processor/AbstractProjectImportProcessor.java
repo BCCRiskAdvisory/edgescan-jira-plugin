@@ -18,10 +18,10 @@ package com.bccriskadvisory.link.processor;
 import static com.bccriskadvisory.link.utility.Utilities.now;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map.Entry;
+
+import org.joda.time.DateTime;
 
 import com.atlassian.jira.bc.ServiceResult;
 import com.atlassian.jira.bc.project.ProjectService.GetProjectResult;
@@ -56,7 +56,7 @@ public abstract class AbstractProjectImportProcessor extends AbstractLogSupporte
 	private EdgescanV1Connector connector;
 	private VulnerabilityDetailGenerator vulnerabilityDetailGenerator;
 
-	private ZonedDateTime importStartedAt;
+	private DateTime importStartedAt;
 
 	public AbstractProjectImportProcessor(final JiraPluginContext pluginContext, final ImportMode importMode, final boolean testMode) {
 		this.pluginContext = checkNotNull(pluginContext, "Plugin context");
@@ -88,13 +88,13 @@ public abstract class AbstractProjectImportProcessor extends AbstractLogSupporte
 			try {
 				noteStartTime();
 				
-				final Optional<List<Vulnerability>> vulnerabilities = getVulnerabilitiesToImport();
+				final List<Vulnerability> vulnerabilities = getVulnerabilitiesToImport();
 				
-				if (vulnerabilities.isPresent() && !vulnerabilities.get().isEmpty()) {
+				if (!vulnerabilities.isEmpty()) {
 					preProcess();
 					try (TimedTask linkUpdateTask = new TimedTask("Import vulnerability data from edgescan for project: " + link)) {
 						
-						for (final Vulnerability vulnerability : vulnerabilities.get()) {
+						for (final Vulnerability vulnerability : vulnerabilities) {
 							processVulnerability(vulnerability);
 						}
 					}
@@ -129,12 +129,12 @@ public abstract class AbstractProjectImportProcessor extends AbstractLogSupporte
 		}
 	}
 	
-	private Optional<List<Vulnerability>> getVulnerabilitiesToImport() throws EdgescanConnectionException {
+	private List<Vulnerability> getVulnerabilitiesToImport() throws EdgescanConnectionException {
 		final RequestBuilder vulnerabilityRequest = connector.vulnerabilities();
 		vulnerabilityRequest.stringQuery("asset_id_in", Joiner.on(",").join(link.getAssets()));
 		
-		if (importMode.isUpdate() && link.getLastUpdated().isPresent()) {
-			vulnerabilityRequest.dateQuery("updated_at_after", link.getLastUpdated().get());
+		if (importMode.isUpdate() && link.getLastUpdated() != null) {
+			vulnerabilityRequest.dateQuery("updated_at_after", link.getLastUpdated());
 		}
 		
 		return vulnerabilityRequest.execute().getVulnerabilities();
@@ -169,9 +169,9 @@ public abstract class AbstractProjectImportProcessor extends AbstractLogSupporte
 	}
 
 	private void open(VulnerabilityImportProcessor processor, Risk edgescanRisk) {
-		final Optional<ServiceResult> openResult = recordValidationErrors(processor.open());
+		final ServiceResult openResult = recordValidationErrors(processor.open());
 		
-		if (openResult.isPresent() && openResult.get().isValid()) {
+		if (openResult != null && openResult.isValid()) {
 			processor.link();
 			importResults.forRisk(edgescanRisk).opened();
 		} else {
@@ -180,9 +180,9 @@ public abstract class AbstractProjectImportProcessor extends AbstractLogSupporte
 	}
 	
 	private void close(VulnerabilityImportProcessor processor, Risk edgescanRisk) {
-		final Optional<ServiceResult> closeResult = recordValidationErrors(processor.close());
+		final ServiceResult closeResult = recordValidationErrors(processor.close());
 		
-		if (closeResult.isPresent() && closeResult.get().isValid()) {
+		if (closeResult != null && closeResult.isValid()) {
 			processor.unlink();
 			importResults.forRisk(edgescanRisk).closed();
 		} else {
@@ -191,18 +191,18 @@ public abstract class AbstractProjectImportProcessor extends AbstractLogSupporte
 	}
 
 	private void update(VulnerabilityImportProcessor processor, Risk edgescanRisk) {
-		final Optional<ServiceResult> updateResult = recordValidationErrors(processor.update());
+		final ServiceResult updateResult = recordValidationErrors(processor.update());
 		
-		if (updateResult.isPresent() && updateResult.get().isValid()) {
+		if (updateResult != null && updateResult.isValid()) {
 			importResults.forRisk(edgescanRisk).updated();
 		} else {
 			importResults.forRisk(edgescanRisk).failed();
 		}
 	}
 	
-	protected Optional<ServiceResult> recordValidationErrors(Optional<ServiceResult> result) {
-		if (result.isPresent() && !result.get().isValid()) {
-			for (Entry<String, String> error : result.get().getErrorCollection().getErrors().entrySet()) {
+	protected ServiceResult recordValidationErrors(ServiceResult result) {
+		if (result != null && !result.isValid()) {
+			for (Entry<String, String> error : result.getErrorCollection().getErrors().entrySet()) {
 				final String errorString = String.format("Import failed on [%s], because [%s]", error.getKey(), error.getValue());
 				importResults.addError(new PluginError("Import failed", errorString));
 				getLog().error(errorString);

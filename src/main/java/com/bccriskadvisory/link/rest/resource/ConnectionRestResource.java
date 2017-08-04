@@ -18,7 +18,6 @@ package com.bccriskadvisory.link.rest.resource;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -98,8 +97,8 @@ public class ConnectionRestResource extends AbstractRestResource {
 			final EdgescanV1Connector connector = new EdgescanV1Connector(requestFactory, found);
 			
 			try {
-				final Optional<List<Asset>> assets = connector.assets().execute().getAssets();
-				if (assets.isPresent() && !assets.get().isEmpty()) {
+				final List<Asset> assets = connector.assets().execute().getAssets();
+				if (assets != null && !assets.isEmpty()) {
 					return respondOk();
 				} else {
 					return respondError("Configuration Error", String.format("No assets were found using the edgescan connector" + found.getName()));

@@ -1,4 +1,4 @@
-do (baseUrl = "/jira/rest/eslink/1.0/links") ->
+do (baseUrl = "/rest/eslink/1.0/links") ->
   root = -> $("#es-project-link-summary-container")
 
   projectUrl= -> "#{baseUrl}/#{projectkey()}"

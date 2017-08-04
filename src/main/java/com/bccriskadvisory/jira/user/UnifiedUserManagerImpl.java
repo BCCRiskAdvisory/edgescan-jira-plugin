@@ -15,8 +15,6 @@
  */
 package com.bccriskadvisory.jira.user;
 
-import java.util.Optional;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.atlassian.jira.user.ApplicationUser;
@@ -43,9 +41,8 @@ public class UnifiedUserManagerImpl implements UnifiedUserManager {
 	}
 	
 	@Override
-	public Optional<ApplicationUser> getUser(HttpServletRequest req) {
-		final ApplicationUser userByName = jiraUserManager.getUserByName(salUserManager.getRemoteUsername(req));
-		return Optional.ofNullable(userByName);
+	public ApplicationUser getUser(HttpServletRequest req) {
+		return jiraUserManager.getUserByName(salUserManager.getRemoteUsername(req));
 	}
 
 	@Override

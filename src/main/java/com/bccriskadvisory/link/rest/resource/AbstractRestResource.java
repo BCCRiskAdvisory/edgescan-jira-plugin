@@ -15,8 +15,6 @@
  */
 package com.bccriskadvisory.link.rest.resource;
 
-import java.util.Optional;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -42,15 +40,15 @@ public abstract class AbstractRestResource extends AbstractLogSupported {
 	}
 	
 	protected boolean notAuthed(final HttpServletRequest request) {
-		Optional<ApplicationUser> user = userManager.getUser(request);
+		ApplicationUser user = userManager.getUser(request);
 		
-		return !user.isPresent() || !userManager.getSalUserManager().isSystemAdmin(user.get().getName());
+		return user == null || !userManager.getSalUserManager().isSystemAdmin(user.getName());
 	}
 	
 	protected Response noAuthResponse(final HttpServletRequest request) {
-		Optional<ApplicationUser> user = userManager.getUser(request);
+		ApplicationUser user = userManager.getUser(request);
 		
-		if (user.isPresent()) {
+		if (user != null) {
 			return respondNotAuthorized();
 		} else {
 			return respondNotAuthenticated();

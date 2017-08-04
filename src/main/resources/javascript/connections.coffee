@@ -1,5 +1,5 @@
 
-do (baseUrl = "/jira/rest/eslink/1.0/connections", paramNames = ['ID', 'name', 'description', 'url', 'apiKey', 'pollingInterval', 'isEnabled']) ->
+do (baseUrl = "/rest/eslink/1.0/connections", paramNames = ['ID', 'name', 'description', 'url', 'apiKey', 'pollingInterval', 'isEnabled']) ->
   AJS.toInit () ->
     if $("#connection-config-container").length
       populateForm()

@@ -15,8 +15,9 @@
  */
 package com.bccriskadvisory.link.rest.edgescan;
 
-import java.time.ZonedDateTime;
 import java.util.List;
+
+import org.joda.time.DateTime;
 
 public class Asset extends EdgescanObject {
 
@@ -29,7 +30,7 @@ public class Asset extends EdgescanObject {
 	private boolean authenticated;
 	private int host_count;
 	private int assessment_count;
-	private ZonedDateTime next_assessment_date;
+	private DateTime next_assessment_date;
 	private List<Assessment> assessments;
 	
 	public String getName() {
@@ -60,7 +61,7 @@ public class Asset extends EdgescanObject {
 		return assessment_count;
 	}
 
-	public ZonedDateTime getNextAssessmentDate() {
+	public DateTime getNextAssessmentDate() {
 		return next_assessment_date;
 	}
 

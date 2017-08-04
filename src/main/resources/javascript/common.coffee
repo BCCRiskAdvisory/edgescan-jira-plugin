@@ -30,7 +30,7 @@ inputValue = (key) ->
 ajax_call = (method) -> 
   (url, data, onComplete, onError = nop) ->
     AJS.$.ajax {
-      url: url
+      url: "#{AJS.contextPath()}#{url}"
       type: method
       contentType: "application/json"
       data: JSON.stringify data

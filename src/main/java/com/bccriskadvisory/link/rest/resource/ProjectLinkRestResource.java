@@ -19,7 +19,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -79,10 +78,10 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 	public Response show(@PathParam("id") final String key, @Context final HttpServletRequest request) {
 		if (notAuthed(request)) return noAuthResponse(request);
 		
-		final Optional<ProjectLink> link = getLinkByProjectKey(key);
+		final ProjectLink link = getLinkByProjectKey(key);
 		
-		if (link.isPresent()) {
-			return linkWithDetails(request, link.get());
+		if (link != null) {
+			return linkWithDetails(request, link);
 		} else {
 			return respondNotFound();
 		}
@@ -93,7 +92,11 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 	public Response edit(@PathParam("id") final String key, @Context final HttpServletRequest request) {
 		if (notAuthed(request)) return noAuthResponse(request);
 		
-		final ProjectLink link = getLinkByProjectKey(key).orElse(new ProjectLink(key));
+		ProjectLink link = getLinkByProjectKey(key);
+		if (link == null) {
+			link = new ProjectLink(key); 
+		}
+		
 		FormStructure form = new ProjectLinkForm(pluginContext).withLink(link).build();
 		
 		return respond(new PluginResponse().withLink(link).withFormStructure(form));
@@ -103,13 +106,13 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 	public Response create(@Context final HttpServletRequest request, final String body) {
 		if (notAuthed(request)) return noAuthResponse(request);
 		
-		final Optional<ProjectLink> newLink = getLinkFromBody(body);
+		final ProjectLink newLink = getLinkFromBody(body);
 		
-		if (newLink.isPresent()) {
-			ValidationResult validation = new ProjectLinkValidator(pluginContext, true).validate(newLink.get());
+		if (newLink != null) {
+			ValidationResult validation = new ProjectLinkValidator(pluginContext, true).validate(newLink);
 			
 			if (validation.isValid()) {
-				final ProjectLink created = projectLinkService.create(newLink.get());
+				final ProjectLink created = projectLinkService.create(newLink);
 			
 				return linkWithDetails(request, created);
 			} else {
@@ -125,13 +128,13 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 	public Response update(@PathParam("id") final String id, @Context final HttpServletRequest request, final String body) {
 		if (notAuthed(request)) return noAuthResponse(request);
 		
-		final Optional<ProjectLink> updatedLink = getLinkFromBody(body);
+		final ProjectLink updatedLink = getLinkFromBody(body);
 		
-		if (updatedLink.isPresent()) {
-			ValidationResult validation = new ProjectLinkValidator(pluginContext, false).validate(updatedLink.get());
+		if (updatedLink != null) {
+			ValidationResult validation = new ProjectLinkValidator(pluginContext, false).validate(updatedLink);
 			
 			if (validation.isValid()) {
-				final ProjectLink updated = projectLinkService.update(updatedLink.get());
+				final ProjectLink updated = projectLinkService.update(updatedLink);
 				
 				return linkWithDetails(request, updated);
 			} else {
@@ -147,10 +150,10 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 	public Response toggleEnabled(@PathParam("id") final String id, @Context final HttpServletRequest request) {
 		if (notAuthed(request)) return noAuthResponse(request);
 
-		Optional<ProjectLink> linkByKey = getLinkByProjectKey(id);
+		ProjectLink linkByKey = getLinkByProjectKey(id);
 		
-		if (linkByKey.isPresent()) {
-			ProjectLink toUpdate = linkByKey.get();
+		if (linkByKey != null) {
+			ProjectLink toUpdate = linkByKey;
 			toUpdate.toggleEnabled();
 			
 			ProjectLink updated = projectLinkService.update(toUpdate);
@@ -168,11 +171,11 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 		boolean testMode = Boolean.parseBoolean(request.getParameter("testMode"));
 		ImportMode importMode = ImportMode.fromString(request.getParameter("mode"));
 		
-		final Optional<ProjectLink> projectLink = getLinkByProjectKey(id);
+		final ProjectLink projectLink = getLinkByProjectKey(id);
 		
-		if (projectLink.isPresent()) {
+		if (projectLink != null) {
 			final ProjectImportProcessor processor = importMode.createProcessor(pluginContext, testMode);
-			processor.initWithLink(projectLink.get());
+			processor.initWithLink(projectLink);
 			final ImportResults importResults = processor.processImport();
 			
 			return respond(new PluginResponse().withImportResults(importResults));
@@ -186,10 +189,10 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 	public Response buildForm(@Context final HttpServletRequest request, final String body) {
 		if (notAuthed(request)) return noAuthResponse(request);
 
-		final Optional<ProjectLink> linkFromBody = getLinkFromBody(body);
+		final ProjectLink linkFromBody = getLinkFromBody(body);
 		
-		if (linkFromBody.isPresent()) {
-			FormStructure form = new ProjectLinkForm(pluginContext).withLink(linkFromBody.get()).build();
+		if (linkFromBody != null) {
+			FormStructure form = new ProjectLinkForm(pluginContext).withLink(linkFromBody).build();
 			
 			return respond(new PluginResponse().withFormStructure(form));
 		} else {
@@ -202,9 +205,9 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 	public Response testParse(@PathParam("id") final String id, @PathParam("vid") final String vid, @Context final HttpServletRequest request) {
 		if (notAuthed(request)) return noAuthResponse(request);
 
-		Optional<ProjectLink> link = getLinkByProjectKey(id);
-		if (link.isPresent()) {
-			Connection connection = pluginContext.getConnectionService().find(link.get().getConnectionId());
+		ProjectLink link = getLinkByProjectKey(id);
+		if (link != null) {
+			Connection connection = pluginContext.getConnectionService().find(link.getConnectionId());
 			EdgescanV1Connector connector = new EdgescanV1Connector(pluginContext.getRequestFactory(), connection);
 			
 			VulnerabilityDetailGenerator detailGenerator = new VulnerabilityDetailGenerator(connector);
@@ -216,26 +219,26 @@ public class ProjectLinkRestResource extends AbstractRestResource {
 		return respondNotFound();
 	}
 	
-	private Optional<ProjectLink> getLinkFromBody(final String body) {
-		if (body == null) return Optional.empty();
+	private ProjectLink getLinkFromBody(final String body) {
+		if (body == null) return null;
 		
 		try {
-			return Optional.ofNullable(GsonObject.fromJson(body, ProjectLink.class));
+			return GsonObject.fromJson(body, ProjectLink.class);
 		} catch(final JsonSyntaxException e) {
-			return Optional.empty();
+			return null;
 		}
 	}
 	
-	private Optional<ProjectLink> getLinkByProjectKey(final String key) {
+	private ProjectLink getLinkByProjectKey(final String key) {
 		final List<ProjectLink> links = projectLinkService.findBy("PROJECT_KEY = ?", key);
 		
-		return links.isEmpty() ? Optional.empty() : Optional.of(links.get(0));
+		return links.isEmpty() ? null : links.get(0);
 	}
 	
 	private Response linkWithDetails(final HttpServletRequest request, final ProjectLink link) {
-		final Optional<ApplicationUser> user = pluginContext.getUserManager().getUser(request);
+		final ApplicationUser user = pluginContext.getUserManager().getUser(request);
 		
-		ProjectLinkDetails detail = new ProjectLinkTranslator(pluginContext).detail(link, user.get());
+		ProjectLinkDetails detail = new ProjectLinkTranslator(pluginContext).detail(link, user);
 		return respond(new PluginResponse().withLink(link).withLinkDetails(detail));
 	}
 	

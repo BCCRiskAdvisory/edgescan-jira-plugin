@@ -17,13 +17,15 @@ package com.bccriskadvisory.link.connector;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Request.MethodType;
@@ -37,7 +39,7 @@ import com.google.common.base.Joiner;
 
 public class EdgescanV1Connector {
 
-	private static final DateTimeFormatter EDGESCAN_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+	private static final DateTimeFormatter EDGESCAN_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss");
 	
 	private static final String ASSET_ENDPOINT = "assets";
 	private static final String VULNERABILITY_ENDPOINT = "vulnerabilities";
@@ -94,8 +96,8 @@ public class EdgescanV1Connector {
 			return this;
 		}
 		
-		public RequestBuilder dateQuery(String key, ZonedDateTime zonedDateTime) {
-			return stringQuery(key, EDGESCAN_FORMAT.format(zonedDateTime));
+		public RequestBuilder dateQuery(String key, DateTime zonedDateTime) {
+			return stringQuery(key, EDGESCAN_FORMAT.print(zonedDateTime));
 		}
 		
 		public RequestBuilder stringQuery(String key, String value) {

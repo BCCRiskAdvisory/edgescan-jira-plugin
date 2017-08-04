@@ -15,9 +15,9 @@
  */
 package com.bccriskadvisory.jira.ao.projectlink;
 
-import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
+
+import org.joda.time.DateTime;
 
 import com.bccriskadvisory.jira.ao.PluginObject;
 import com.bccriskadvisory.link.rest.edgescan.Risk;
@@ -32,8 +32,8 @@ public class ProjectLink extends GsonObject implements PluginObject<ProjectLinkE
 
 	private int ID;
 	private String projectKey;
-	private Optional<Boolean> isEnabled = Optional.empty();
-	private Optional<ZonedDateTime> lastUpdated = Optional.empty();
+	private Boolean isEnabled;
+	private DateTime lastUpdated;
 
 	private Integer connectionId;
 	private List<Integer> assets;
@@ -59,7 +59,7 @@ public class ProjectLink extends GsonObject implements PluginObject<ProjectLinkE
 		ID = entity.getID();
 		connectionId = entity.getConnectionId();
 		projectKey = entity.getProjectKey();
-		isEnabled = Optional.of(entity.isEnabled());
+		isEnabled = entity.isEnabled();
 		lastUpdated = Utilities.fromDate(entity.getLastUpdated());
 
 		assets = new Gson().fromJson(entity.getAssets(), INTEGER_LIST_TYPE.getType());
@@ -80,8 +80,8 @@ public class ProjectLink extends GsonObject implements PluginObject<ProjectLinkE
 	public void copyTo(ProjectLinkEntity entity) {
 		entity.setConnectionId(connectionId);
 		entity.setProjectKey(projectKey);
-		if (isEnabled.isPresent())   entity.setEnabled(isEnabled.get());
-		if (lastUpdated.isPresent()) entity.setLastUpdated(Utilities.toDate(lastUpdated));
+		if (isEnabled != null)   entity.setEnabled(isEnabled);
+		if (lastUpdated != null) entity.setLastUpdated(Utilities.toDate(lastUpdated));
 
 		entity.setAssets(new Gson().toJson(assets));
 
@@ -126,16 +126,16 @@ public class ProjectLink extends GsonObject implements PluginObject<ProjectLinkE
 		return closeStatusId;
 	}
 
-	public Optional<ZonedDateTime> getLastUpdated() {
+	public DateTime getLastUpdated() {
 		return lastUpdated;
 	}
 
 	public boolean isEnabled() {
-		return isEnabled.get();
+		return isEnabled;
 	}
 	
 	public void toggleEnabled() {
-		this.isEnabled = Optional.of(!isEnabled.get());
+		this.isEnabled = !isEnabled;
 	}
 
 	public String getProjectKey() {
@@ -187,7 +187,7 @@ public class ProjectLink extends GsonObject implements PluginObject<ProjectLinkE
 		return criticalPriorityId;
 	}
 
-	public void setLastUpdated(ZonedDateTime lastUpdated) {
-		this.lastUpdated = Optional.ofNullable(lastUpdated);
+	public void setLastUpdated(DateTime lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 }

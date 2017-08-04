@@ -16,7 +16,6 @@
 package com.bccriskadvisory.link.processor;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.atlassian.jira.bc.issue.IssueService;
@@ -88,13 +87,13 @@ public class FullProjectImportProcessor extends AbstractProjectImportProcessor {
 					}
 					importResults.deleted();
 				} else {
-					recordValidationErrors(Optional.of(validateResult));
+					recordValidationErrors(validateResult);
 				}
 			} else {
 				if (!testMode) {
 					unlink(orphanedLink);
 				}
-				recordValidationErrors(Optional.of(issueResult));
+				recordValidationErrors(issueResult);
 			}
 				
 		}

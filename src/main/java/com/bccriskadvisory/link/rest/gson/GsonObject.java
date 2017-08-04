@@ -15,16 +15,14 @@
  */
 package com.bccriskadvisory.link.rest.gson;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
+import org.joda.time.DateTime;
 
 import com.google.gson.GsonBuilder;
 
 public class GsonObject {
 	
 	private static final GsonBuilder GSON_BUILDER = new GsonBuilder()
-		.registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeAdapter())
-		.registerTypeAdapter(Optional.class, new OptionalAdapter<>());
+		.registerTypeAdapter(DateTime.class, new DateTimeAdapter());
 
 	public String toString() {
 		return GSON_BUILDER.create().toJson(this);

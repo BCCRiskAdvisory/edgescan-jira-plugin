@@ -15,44 +15,48 @@
  */
 package com.bccriskadvisory.link.rest.edgescan;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.bccriskadvisory.link.rest.gson.GsonObject;
 
-
 public class EdgescanResponse extends GsonObject {
-	
+
 	private int total;
 	private int count;
-	
+
 	private List<Asset> assets;
 	private Asset asset;
-	
+
 	private List<Vulnerability> vulnerabilities;
 	private Vulnerability vulnerability;
-	
+
+	public EdgescanResponse() {
+		this.assets = new ArrayList<>();
+		this.vulnerabilities = new ArrayList<>();
+	}
+
 	public int getTotal() {
 		return total;
 	}
-	
+
 	public int getCount() {
 		return count;
 	}
-	
-	public Optional<List<Asset>> getAssets() {
-		return Optional.ofNullable(assets);
+
+	public List<Asset> getAssets() {
+		return assets;
 	}
-	
-	public Optional<Asset> getAsset() {
-		return Optional.ofNullable(asset);
+
+	public Asset getAsset() {
+		return asset;
 	}
-	
-	public Optional<List<Vulnerability>> getVulnerabilities() {
-		return Optional.ofNullable(vulnerabilities);
+
+	public List<Vulnerability> getVulnerabilities() {
+		return vulnerabilities;
 	}
-	
-	public Optional<Vulnerability> getDetailedVulnerability() {
-		return Optional.ofNullable(vulnerability);
+
+	public Vulnerability getDetailedVulnerability() {
+		return vulnerability;
 	}
 }

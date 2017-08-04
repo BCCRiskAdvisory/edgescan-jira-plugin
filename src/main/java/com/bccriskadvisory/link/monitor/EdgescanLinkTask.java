@@ -15,10 +15,9 @@
  */
 package com.bccriskadvisory.link.monitor;
 
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Map;
-import java.util.Optional;
+
+import org.joda.time.DateTime;
 
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.security.JiraAuthenticationContext;
@@ -67,11 +66,11 @@ public class EdgescanLinkTask implements PluginJob {
 	}
 
 	private boolean updateDue(final ProjectLink link, final Connection connection) {
-		final Optional<ZonedDateTime> linkLastUpdated = link.getLastUpdated();
-		final ZonedDateTime now = Utilities.now();
+		final DateTime linkLastUpdated = link.getLastUpdated();
+		final DateTime now = Utilities.now();
 
-		if (linkLastUpdated.isPresent()) {
-			final ZonedDateTime nextUpdateTime = linkLastUpdated.get().plus(Long.parseLong(connection.getPollingInterval()), ChronoUnit.MINUTES);
+		if (linkLastUpdated != null) {
+			final DateTime nextUpdateTime = linkLastUpdated.plusMinutes(Integer.parseInt(connection.getPollingInterval()));
 			return now.isAfter(nextUpdateTime);
 		} else {
 			return true; 

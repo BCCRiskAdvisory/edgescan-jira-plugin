@@ -71,12 +71,12 @@ public class ConnectionValidator {
 		if (isNullOrEmpty(url)) {
 			result.addMessage("No URL given: please provide an edgescan url .");
 		} else {
-			if(!url.startsWith("https://")) {
+			if(!url.startsWith("https://") && !url.startsWith("http://")) {
 				result.addMessage("Invalid URL format: please specify protocol");
 			}
 			
 			if(!url.endsWith("/")) {
-				result.addMessage("Invalid URL format: url must incldue a trailing '/'");
+				result.addMessage("Invalid URL format: url must include a trailing '/'");
 			}
 		}
 	}
@@ -85,7 +85,7 @@ public class ConnectionValidator {
 		final String name = connection.getName();
 		
 		if (isNotNullOrEmpty(name)) {
-			final List<Connection> sameName = connectionService.findBy("name = ?", name);
+			final List<Connection> sameName = connectionService.findBy("NAME = ?", name);
 			
 			if (sameName.size() > 0 && sameName.get(0).getID() != connection.getID()) {
 				result.addMessage("Invalid name given: connection names must be unique.");

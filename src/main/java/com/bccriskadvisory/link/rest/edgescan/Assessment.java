@@ -15,20 +15,19 @@
  */
 package com.bccriskadvisory.link.rest.edgescan;
 
-import java.time.ZonedDateTime;
-
+import org.joda.time.DateTime;
 
 public class Assessment extends EdgescanObject {
 
 	private int asset_id;
-	private ZonedDateTime date;
+	private DateTime date;
 	private String status;
 	
 	public int getAsset_id() {
 		return asset_id;
 	}
 	
-	public ZonedDateTime getDate() {
+	public DateTime getDate() {
 		return date;
 	}
 	

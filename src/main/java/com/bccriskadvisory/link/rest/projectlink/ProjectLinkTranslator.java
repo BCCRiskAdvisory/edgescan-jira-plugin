@@ -16,10 +16,11 @@
 package com.bccriskadvisory.link.rest.projectlink;
 
 import java.net.URI;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.atlassian.jira.avatar.Avatar.Size;
 import com.atlassian.jira.config.ConstantsManager;
@@ -39,7 +40,7 @@ import com.google.common.base.Joiner;
 
 public class ProjectLinkTranslator extends AbstractLogSupported {
 	
-	private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormatter.RFC_1123_DATE_TIME;
+	private static final DateTimeFormatter DISPLAY_FORMAT = DateTimeFormat.forPattern("EEE, dd MMM yyyy HH:mm:ss zzz");
 	
 	private JiraPluginContext pluginContext;
 
@@ -57,9 +58,9 @@ public class ProjectLinkTranslator extends AbstractLogSupported {
 		populateUserInfo(link, remoteUser, detailedLink);
 		populateRemaining(link, detailedLink);
 
-		final Optional<ZonedDateTime> dateTimeFromDate = link.getLastUpdated();
-		if (dateTimeFromDate.isPresent()) {
-			detailedLink.setLastUpdated(DISPLAY_FORMAT.format(dateTimeFromDate.get()));
+		final DateTime lastUpdated = link.getLastUpdated();
+		if (lastUpdated != null) {
+			detailedLink.setLastUpdated(DISPLAY_FORMAT.print(lastUpdated));
 		}
 		
 		return detailedLink;
@@ -84,7 +85,7 @@ public class ProjectLinkTranslator extends AbstractLogSupported {
 	}
 
 	private void populateAssets(ProjectLink link, Connection connection, final ProjectLinkDetails detailedLink) {
-		Optional<List<Asset>> assets;
+		List<Asset> assets;
 		try {
 			assets = getAssets(link, connection);
 		} catch (EdgescanConnectionException e) {
@@ -93,14 +94,14 @@ public class ProjectLinkTranslator extends AbstractLogSupported {
 			return;
 		}
 		
-		if (assets.isPresent()) {
-			for (Asset asset : assets.get()) {
+		if (!assets.isEmpty()) {
+			for (Asset asset : assets) {
 				detailedLink.addAsset(asset.getId(), asset.getName());
 			}
 		}
 	}
 
-	private Optional<List<Asset>> getAssets(ProjectLink link, Connection connection) throws EdgescanConnectionException {
+	private List<Asset> getAssets(ProjectLink link, Connection connection) throws EdgescanConnectionException {
 		EdgescanV1Connector requestFactory = new EdgescanV1Connector(pluginContext.getRequestFactory(), connection);
 		
 		EdgescanResponse edgescanResponse = requestFactory.assets().stringQuery("id_in", Joiner.on(",").join(link.getAssets())).execute();

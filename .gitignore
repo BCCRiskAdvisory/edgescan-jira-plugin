@@ -5,6 +5,7 @@ target/
 .settings/
 .classpath
 .project
+.metadata/
 
 #general
 *.log
@@ -12,3 +13,6 @@ target/
 
 #sass
 src/main/resources/.sass-cache/
+
+#tests
+src/test/

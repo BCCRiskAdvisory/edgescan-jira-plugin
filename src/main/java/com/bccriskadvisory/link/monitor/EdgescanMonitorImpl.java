@@ -82,9 +82,9 @@ public class EdgescanMonitorImpl extends AbstractLogSupported implements Initial
 			if (scheduled) return;
 
 			try {
-				Map<String, Object> jobDataMap = Collections.singletonMap(KEY, this);
+				Map<String, Object> jobDataMap = Collections.singletonMap(KEY, (Object) this);
 
-				scheduler.scheduleJob(JOB_NAME, EdgescanLinkTask.class, jobDataMap, Date.from(Utilities.now().toInstant()), interval);
+				scheduler.scheduleJob(JOB_NAME, EdgescanLinkTask.class, jobDataMap, Utilities.now().toDate(), interval);
 			} catch (Exception e) {
 				getLog().error("Unable to schedule edgescan link task.");
 			}

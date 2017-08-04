@@ -16,19 +16,17 @@
 package com.bccriskadvisory.link.utility;
 
 import java.sql.Timestamp;
-import java.time.DateTimeException;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Date;
-import java.util.Optional;
+
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.google.common.base.Strings;
 
 public class Utilities {
 
-	private static final ZoneOffset UTC = ZoneOffset.UTC;
+	private static final DateTimeZone UTC = DateTimeZone.UTC;
 
 	public static boolean isNullOrEmpty(String input) {
 		return Strings.isNullOrEmpty(input);
@@ -38,45 +36,41 @@ public class Utilities {
 		return !isNullOrEmpty(input);
 	}
 	
-	public static ZonedDateTime now() {
-		return ZonedDateTime.now(UTC);
+	public static DateTime now() {
+		return DateTime.now(UTC);
 	}
 	
-	public static Date toDate(Optional<ZonedDateTime> date) {
-		if (date.isPresent()) {
-			return Date.from(date.get().toInstant());
+	public static Date toDate(DateTime date) {
+		if (date != null) {
+			return date.toDate();
 		} else {
 			return null;
 		}
 	}
 	
-	public static Optional<ZonedDateTime> fromDate(Date date) {
-		if (date == null) return Optional.empty();
+	public static DateTime fromDate(Date date) {
+		if (date == null) return null;
 		
 		try {
-			return Optional.of(ZonedDateTime.ofInstant(date.toInstant(), UTC));
-		} catch (DateTimeException e) {
-			return Optional.empty();
+			return new DateTime(date, UTC);
+		} catch (IllegalArgumentException e) {
+			return null;
 		}
 	}
 	
-	public static Optional<ZonedDateTime> fromTimestamp(Timestamp timestamp) {
-		if (timestamp == null) return Optional.empty();
+	public static DateTime fromTimestamp(Timestamp timestamp) {
+		if (timestamp == null) return null;
 		
 		try {
-			return Optional.of(ZonedDateTime.ofInstant(timestamp.toInstant(), UTC));
-		} catch (DateTimeException e) {
-			return Optional.empty();
+			return new DateTime(timestamp, UTC);
+		} catch (IllegalArgumentException e) {
+			return null;
 		}
 	}
 	
-	public static Optional<ZonedDateTime> fromString(String dateString, DateTimeFormatter formatter) {
-		if (dateString == null || formatter == null) return Optional.empty();
+	public static DateTime fromString(String dateString, DateTimeFormatter formatter) {
+		if (dateString == null || formatter == null) return null;
 		
-		try {
-			return Optional.of(ZonedDateTime.parse(dateString, formatter));
-		} catch (DateTimeParseException e) {
-			return Optional.empty();
-		}
+		return DateTime.parse(dateString, formatter);
 	}
 }
