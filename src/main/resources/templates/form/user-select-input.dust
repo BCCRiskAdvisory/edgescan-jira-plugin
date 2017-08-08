@@ -1,0 +1,4 @@
+<div class="field-group">
+    <label for="{name}">{label}:</label>
+    <input id="{name}" name="{name}" {?value}value="{value}"{/value} type="hidden" style="width:250px"></input>
+</div>

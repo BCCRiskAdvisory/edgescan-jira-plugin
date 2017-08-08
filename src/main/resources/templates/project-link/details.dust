@@ -51,12 +51,23 @@
         <td>{riskName}</td>
         <td><span class="aui-icon aui-icon-small aui-iconfont-devtools-arrow-right"></span></td>
         <td>
-            {?icon} <img src="{icon}" alt="{priorityName}"> {/icon}
+            {?icon}
+             <span class="aui-avatar aui-avatar-small">
+    			<span class="aui-avatar-inner">
+	            	<img src="{icon}" alt="{priorityName}"> 
+		    	</span>
+			</span>
+            {/icon}
             {~s}{priorityName}</td>
     </tr>
 {/priority}
 {<icon}
-    {?icon} <img src="{icon}" alt="{name}"> {/icon}
+    {?icon}
+    <span class="aui-avatar aui-avatar-small">
+    	<span class="aui-avatar-inner">
+	       	<img src="{icon}" alt="{priorityName}"> 
+	   	</span>
+	</span>{/icon}
     {~s}{name}
 {/icon}
 {<badge}

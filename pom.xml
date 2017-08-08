@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bccriskadvisory</groupId>
     <artifactId>edgescan-jira-plugin</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
     <inceptionYear>2015</inceptionYear>
     <organization>
         <name>BCC Risk advisory</name>
@@ -121,10 +121,6 @@
             <artifactId>guava</artifactId>
             <version>18.0</version>
         </dependency>
-        <!-- Uncomment to use TestKit in your project. Details at https://bitbucket.org/atlassian/jira-testkit -->
-        <!-- You can read more about TestKit at https://developer.atlassian.com/display/JIRADEV/Plugin+Tutorial+-+Smarter+integration+testing+with+TestKit -->
-        <!-- <dependency> <groupId>com.atlassian.jira.tests</groupId> <artifactId>jira-testkit-client</artifactId> 
-			<version>${testkit.version}</version> <scope>test</scope> </dependency> -->
     </dependencies>
     <build>
         <plugins>
@@ -143,10 +139,6 @@
                     </pluginArtifacts>
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.version}</productDataVersion>
-                    <!-- Uncomment to install TestKit backdoor in JIRA. -->
-                    <!-- <pluginArtifacts> <pluginArtifact> <groupId>com.atlassian.jira.tests</groupId> 
-						<artifactId>jira-testkit-plugin</artifactId> <version>${testkit.version}</version> 
-						</pluginArtifact> </pluginArtifacts> -->
                 </configuration>
             </plugin>
             <plugin>
@@ -188,7 +180,7 @@
     </build>
     <properties>
         <ao.version>0.28.7</ao.version>
-        <jira.version>6.4</jira.version>
+        <jira.version>7.1.7</jira.version>
         <amps.version>6.2.11</amps.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <!-- TestKit version 5.x for JIRA 5.x, 6.x for JIRA 6.x -->

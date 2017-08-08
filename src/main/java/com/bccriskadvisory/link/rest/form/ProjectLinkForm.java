@@ -42,6 +42,7 @@ import com.bccriskadvisory.link.connector.EdgescanV1Connector;
 import com.bccriskadvisory.link.rest.edgescan.Asset;
 import com.bccriskadvisory.link.rest.form.components.FormStructure;
 import com.bccriskadvisory.link.rest.form.components.HiddenInput;
+import com.bccriskadvisory.link.rest.form.components.UserSelect;
 import com.bccriskadvisory.link.rest.form.components.Select;
 import com.bccriskadvisory.link.utility.AbstractLogSupported;
 
@@ -154,11 +155,10 @@ public class ProjectLinkForm extends AbstractLogSupported {
 	}
 
 	private FormStructure issueCreationSubsection() {
-		final Map<String, String> userOptions = generateUserOptions();
 		final Map<String, String> issueTypeOptions = generateIssueTypeOptions();
 		final FormStructure issueSection = new FormStructure("issue-create-options", "Issue Creation")		
-			.withInput(new Select("Create as User", "userKey")
-				.withOptions(userOptions))
+			.withInput(new UserSelect("Create as User", "userKey")
+				.withPath("/rest/api/2/user/search"))
 			.withInput(new Select("Create with Issue Type", "issueTypeId")
 				.withOptions(issueTypeOptions));
 				
@@ -231,18 +231,6 @@ public class ProjectLinkForm extends AbstractLogSupported {
 		if (!assets.isEmpty()) {
 			for (final Asset asset : assets) {
 				ret.put(Integer.toString(asset.getId()), asset.getName());
-			}
-		}
-		
-		return ret;
-	}
-	
-	private Map<String, String> generateUserOptions() {
-		final Map<String, String> ret = new HashMap<>();
-		
-		for (final User user : userManager.getJiraUserManager().getAllUsers()) {
-			if (user.isActive()) {
-				ret.put(user.getName(), user.getDisplayName());
 			}
 		}
 		
