@@ -276,7 +276,7 @@
           return put((projectUrl()) + "/toggle", {}, renderLink);
         });
         $("#import-updated").click(function() {
-          return manualImport("updated");
+          return manualImport("update");
         });
         return $("#import-full").click(function() {
           return manualImport("full");

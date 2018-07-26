@@ -12,7 +12,7 @@ do (baseUrl = "/rest/eslink/1.0/links") ->
       $("#enable-disable").click () ->
         put "#{projectUrl()}/toggle", {}, renderLink
       $("#import-updated").click () ->
-        manualImport "updated"
+        manualImport "update"
       $("#import-full").click () ->
         manualImport "full"
 
