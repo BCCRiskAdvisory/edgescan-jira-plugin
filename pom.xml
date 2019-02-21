@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bccriskadvisory</groupId>
     <artifactId>edgescan-jira-plugin</artifactId>
-    <version>1.0.9</version>
+    <version>1.0.10</version>
     <inceptionYear>2015</inceptionYear>
     <organization>
         <name>BCC Risk advisory</name>
@@ -180,7 +180,7 @@
     </build>
     <properties>
         <ao.version>0.28.7</ao.version>
-        <jira.version>7.11.0</jira.version>
+        <jira.version>8.0.1</jira.version>
         <amps.version>6.2.11</amps.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <!-- TestKit version 5.x for JIRA 5.x, 6.x for JIRA 6.x -->
